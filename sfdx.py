@@ -45,7 +45,6 @@ class SfdxOutputText(sublime_plugin.TextCommand):
 	def run(self, edit, text,erase = False, *args, **kwargs):
 		size = self.view.size()
 		self.view.set_read_only(False)
-		print(erase)
 		if erase == True:
 			size = sublime.Region(0, self.view.size())
 			self.view.replace(edit, size, text)
@@ -70,6 +69,155 @@ active_window_id = sublime.active_window().id()
 printer = PanelPrinter.get(active_window_id)
 printer.write("sfdx plugin loaded", erase = True)
 
+class SfdxPushSourceCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		self.dx_folder = dxProjectFolder()
+		printer.show()
+		printer.write('\nPushing source')
+		t = threading.Thread(target=self.run_command)
+		t.start()
+	
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		args = ['sfdx', 'force:source:push']
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		print(r)
+		if p.returncode == 0:
+			printer.write('\n' + str(out,'utf-8'))
+		else:
+			printErr = err
+			if not err is None and not err == '':
+				printErr = out
+			else:
+				printer.write('\nError pushing source')
+			printer.write('\n' + str(printErr,'utf-8'))
+
+class SfdxPullSourceCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		self.dx_folder = dxProjectFolder()
+		printer.show()
+		printer.write('\nPulling source')
+		t = threading.Thread(target=self.run_command)
+		t.start()
+	
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		args = ['sfdx', 'force:source:pull']
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		print(r)
+		if p.returncode == 0:
+			printer.write('\n' + str(out,'utf-8'))
+		else:
+			printErr = err
+			if not err is None and not err == '':
+				printErr = out
+			else:
+				printer.write('\nError pulling source')
+			printer.write('\n' + str(printErr,'utf-8'))
+
+class SfdxOpenScratchOrgCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		self.dx_folder = dxProjectFolder()
+		printer.show()
+		printer.write('\nOpening org')
+		t = threading.Thread(target=self.run_command)
+		t.start()
+	
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		args = ['sfdx', 'force:org:open']
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		print(r)
+		if p.returncode == 0:
+			printer.write('\nScratch org opened')
+		else:
+			printer.write('\nError opening')
+			printer.write('\n' + str(err,'utf-8'))
+
+
+
+class SfdxCreateScratchOrgCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		self.dx_folder = dxProjectFolder()
+		self.def_file = os.path.join(self.dx_folder, 'config', 'project-scratch-def.json')
+		sublime.active_window().show_input_panel('Class Name', self.def_file, self.create_org, None, None)
+		
+	def create_org(self, input):
+		printer.show()
+		printer.write('\nCreating scratch org')
+		self.def_file = input;
+		t = threading.Thread(target=self.run_command)
+		t.start()
+
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		args = ['sfdx', 'force:org:create', '-f', self.def_file, '-a', 'ScratchOrg', '-s']
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		print(r)
+		if p.returncode == 0:
+			printer.write('\nScratch org created')
+		else:
+			printer.write('\nError creating scratch org')
+			printer.write('\n' + str(err,'utf-8'))
+
+
+
 class SfdxAuthDevHubCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		printer.show()
@@ -84,7 +232,7 @@ class SfdxAuthDevHubCommand(sublime_plugin.TextCommand):
 		return True
 
 	def run_command(self):
-		
+		dx_folder = dxProjectFolder()
 		args = ['sfdx', 'force:auth:web:login', '-d', '-s', '-a', 'DevHub']
 		startupinfo = None
 		if os.name == 'nt':
@@ -104,6 +252,7 @@ class SfdxAuthDevHubCommand(sublime_plugin.TextCommand):
 			printer.write('\n' + str(err,'utf-8'))
 
 
+
 class SfdxCreateApexClassCommand(sublime_plugin.WindowCommand):
 	def run(self, paths = []):
 		if len(paths) != 1 or  (len(paths) > 0 and os.path.isfile(paths[0])):
@@ -114,6 +263,15 @@ class SfdxCreateApexClassCommand(sublime_plugin.WindowCommand):
 		self.class_name = 'ApexClassName'
 		self.class_dir = paths[0]
 		sublime.active_window().show_input_panel('Class Name', self.class_name, self.create_class, None, None)
+
+	def is_enabled(self, paths = []):
+		dx_folder = dxProjectFolder()
+		print(dx_folder)
+		if(dx_folder == ''):
+			return False
+		if len(paths) != 1 or  (len(paths) > 0 and os.path.isfile(paths[0])):
+			return False
+		return True
 
 	def create_class(self, input):
 		self.class_name = input

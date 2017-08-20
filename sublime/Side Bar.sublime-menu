@@ -4,10 +4,7 @@
 	    "caption" : "sfdx",
 	    "children": 
 	    	[
-	    		{
-	    			"caption": "Apex",
-	    			"children":
-	    				[
+	    		
 	    					{
 	    						"caption" : "Create Apex Class",
 	    						"command": "sfdx_create_apex_class",
@@ -15,9 +12,9 @@
 	    							"paths":[]
 	    						}
 	    					}
-	    				]
+	    				
 	    			
-	    		}
+	    		
 	    	]
 	}
 ]

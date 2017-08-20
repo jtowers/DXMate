@@ -1,14 +1,30 @@
 [
-  {
-    "caption": "sfdx: Create Project",
-    "command": "sfdx_create_project"
-  },
 	{
-    "caption": "sfdx: Upgrade Project",
-    "command": "sfdx_upgrade_project"
-  },
-  {
-	    				"caption": "sfdx: Authorize Dev Hub",
-	    				"command": "sfdx_auth_dev_hub"
-	    			}
+		"caption": "sfdx: Create Project",
+		"command": "sfdx_create_project"
+	},
+	{
+	    "caption": "sfdx: Upgrade Project",
+	    "command": "sfdx_upgrade_project"
+  	},
+  	{
+		"caption": "sfdx: Authorize Dev Hub",
+		"command": "sfdx_auth_dev_hub"
+	},
+	{
+		"caption": "sfdx: Create Scratch Org",
+		"command": "sfdx_create_scratch_org"
+	},
+	{
+		"caption": "sfdx: Open Scratch Org",
+		"command": "sfdx_open_scratch_org"
+	},
+	{
+		"caption": "sfdx: Push Source",
+		"command": "sfdx_push_source"
+	},
+	{
+		"caption": "sfdx: Pull Source",
+		"command": "sfdx_pull_source"
+	}
 ]

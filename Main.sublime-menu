@@ -27,6 +27,34 @@
 	    				"command": "sfdx_auth_dev_hub"
 	    			}
 	    		]
+	    	},
+	    	{
+	    		"caption": "Org",
+	    		"children": 
+	    		[
+	    			{
+	    				"caption": "Create Scratch Org",
+	    				"command": "sfdx_create_scratch_org"
+	    			},
+	    			{
+						"caption": "Open Scratch Org",
+						"command": "sfdx_open_scratch_org"
+					}
+	    		]
+	    	},
+	    	{
+	    		"caption": "Source",
+	    		"children": 
+	    		[
+	    			{
+	    				"caption": "Push Source",
+	    				"command": "sfdx_push_source"
+	    			},
+	    			{
+						"caption": "Pull Source",
+						"command": "sfdx_pull_source"
+					}
+	    		]
 	    	}
 	    	
 	    ]
