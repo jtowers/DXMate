@@ -1,0 +1,35 @@
+[
+{
+    "id" : "sfdx",
+    "caption" : "SFDX",
+    "children":
+	    [
+	    	{
+	    		"caption": "Project",
+	    		"children" :
+	    		[
+	    			{
+			    		"caption": "Create Project",
+			    		"command" : "sfdx_create_project"
+	    			},
+	    			{
+			    		"caption": "Upgrade Project",
+			    		"command" : "sfdx_upgrade_project"
+	    			}
+	    		]
+	    	},
+	    	{
+	    		"caption": "Auth",
+	    		"children": 
+	    		[
+	    			{
+	    				"caption": "Authorize Dev Hub",
+	    				"command": "sfdx_auth_dev_hub"
+	    			}
+	    		]
+	    	}
+	    	
+	    ]
+    
+}
+]
