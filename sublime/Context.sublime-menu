@@ -1,0 +1,13 @@
+[
+	{
+	    "id" : "dxmate",
+	    "caption" : "DXMate",
+	    "children": 
+	    	[
+				{
+					"caption" : "Run Tests for This Class",
+					"command": "dxmate_run_file_tests"
+				}
+	    	]
+	}
+]

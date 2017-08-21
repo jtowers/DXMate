@@ -25,7 +25,11 @@
 	    			{
 	    				"caption": "Run Org Tests",
 	    				"command": "dxmate_run_org_tests"
-	    			}
+	    			},
+	    			{
+					"caption" : "Run Tests for This Class",
+					"command": "dxmate_run_file_tests"
+				}
 	    		]
 	    	},
 	    	{

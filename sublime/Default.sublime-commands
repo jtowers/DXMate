@@ -26,5 +26,9 @@
 	{
 		"caption": "dxmate: Pull Source",
 		"command": "dxmate_pull_source"
+	},
+	{
+		"caption" : "dxmate: Run Tests for This Class",
+		"command": "dxmate_run_file_tests"
 	}
 ]
