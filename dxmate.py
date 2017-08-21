@@ -5,6 +5,9 @@ import subprocess
 import threading
 import time
 from dxmate.lib.printer import PanelPrinter
+from dxmate.lib.threads import ThreadProgress
+from dxmate.lib.threads import PanelThreadProgress
+import ntpath
 
 def dxProjectFolder():
 	open_folders = sublime.active_window().folders()
@@ -61,30 +64,60 @@ class DxmateOutputText(sublime_plugin.TextCommand):
 	def description(self):
 		return
 
+class WriteOperationStatus(sublime_plugin.TextCommand):
+    def run(self, edit, text, *args, **kwargs):
+        kw_region = kwargs.get('region', [0,0])
+        status_region = sublime.Region(kw_region[0],kw_region[1])
+        size = self.view.size()
+        self.view.set_read_only(False)
+        self.view.replace(edit, status_region, text)
+        self.view.set_read_only(True)
+        #self.view.show(size)
 
-		
-ls = LanguageServer()
-ls.createServer()
+    def is_visible(self):
+        return False
+
+    def is_enabled(self):
+        return True
+
+    def description(self):
+        return
+
+#not ready for code completion yet		
+#ls = LanguageServer()
+#ls.createServer()
+
 active_window_id = sublime.active_window().id()
 printer = PanelPrinter.get(active_window_id)
 printer.write("sfdx plugin loaded", erase = True)
 
-class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
-	def run(self, edit):
+class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
+	def run(self):
 		self.dx_folder = dxProjectFolder()
-		printer.show()
-		printer.write('\nRunning Org Tests')
+		self.active_file = sublime.active_window().active_view().file_name()
+		self.active_file = ntpath.split(self.active_file)[1].replace('.cls', '')
+		self.class_name = 'ApexClassName'
 		t = threading.Thread(target=self.run_command)
 		t.start()
-	
+		printer.show()
+		printer.write('\nRunning Tests')
+		printer.write('\nResult: ')
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Running tests', 'Tests run')
+		PanelThreadProgress(t, 'Running Tests')
+
 	def is_enabled(self):
 		self.dx_folder = dxProjectFolder()
-		if self.dx_folder == '':
+		if(self.dx_folder == ''):
+			return False
+		self.active_file = sublime.active_window().active_view().file_name()
+		if not self.active_file.endswith('.cls'):
 			return False
 		return True
 
 	def run_command(self):
-		args = ['sfdx', 'force:apex:test:run', '-r', 'human', '-u', 'DevHub']
+		args = ['sfdx', 'force:apex:test:run', '-r', 'human', '-l', 'RunSpecifiedTests', '-n', self.class_name]
 		startupinfo = None
 		if os.name == 'nt':
 		    startupinfo = subprocess.STARTUPINFO()
@@ -95,15 +128,61 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
 
 		out,err = p.communicate()
 		r = p.returncode
-		print(r)
 		if p.returncode == 0:
 			printer.write('\n' + str(out,'utf-8'))
 		else:
 			printErr = err
-			if not err is None and not err == '':
+			if err is None or err == '':
 				printErr = out
-			else:
-				printer.write('\nError running tests')
+			printer.write('\n' + str(printErr,'utf-8'))
+
+class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		
+		self.dx_folder = dxProjectFolder()
+		sublime.active_window().show_input_panel('Org (leave blank for default)', '', self.run_tests, None, None)
+		
+	
+	def run_tests(self, input):
+		self.test_org = input
+		printer.show()
+		printer.write('\nRunning Org Tests')
+		printer.write('\nResult: ')
+		t = threading.Thread(target=self.run_command)
+		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Running Org Tests', 'Org tests run')
+		PanelThreadProgress(t, 'Running Org Tests')
+
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		
+		args = ['sfdx', 'force:apex:test:run', '-r', 'human']
+		if not self.test_org is None and len(self.test_org) > 0:
+			args.push('-u')
+			args.push(self.input)
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		if p.returncode == 0:
+			printer.write('\n' + str(out,'utf-8'))
+		else:
+			printErr = err
+			if err is None or err == '':
+				printErr = out
 			printer.write('\n' + str(printErr,'utf-8'))
 
 
