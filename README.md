@@ -14,8 +14,9 @@ Supports most useful CLI commands including:
 * Create Apex classes
 * Run tests for an org or specific class
 
+Uses syntax highlighting from MavensMate
+
 ## TODO
-* Syntax highlighting
 * Code completion
 * Settings
 
