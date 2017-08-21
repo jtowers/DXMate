@@ -4,7 +4,7 @@ import os
 import subprocess
 import threading
 import time
-from sfdx.lib.printer import PanelPrinter
+from dxmate.lib.printer import PanelPrinter
 
 def dxProjectFolder():
 	open_folders = sublime.active_window().folders()
@@ -41,7 +41,7 @@ class LanguageServer:
 
 
 #generic handler for writing text to an output panel (sublime text 3 requirement)
-class SfdxOutputText(sublime_plugin.TextCommand):
+class DxmateOutputText(sublime_plugin.TextCommand):
 	def run(self, edit, text,erase = False, *args, **kwargs):
 		size = self.view.size()
 		self.view.set_read_only(False)
@@ -69,7 +69,7 @@ active_window_id = sublime.active_window().id()
 printer = PanelPrinter.get(active_window_id)
 printer.write("sfdx plugin loaded", erase = True)
 
-class SfdxPushSourceCommand(sublime_plugin.TextCommand):
+class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
@@ -106,7 +106,7 @@ class SfdxPushSourceCommand(sublime_plugin.TextCommand):
 				printer.write('\nError pushing source')
 			printer.write('\n' + str(printErr,'utf-8'))
 
-class SfdxPullSourceCommand(sublime_plugin.TextCommand):
+class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
@@ -143,7 +143,7 @@ class SfdxPullSourceCommand(sublime_plugin.TextCommand):
 				printer.write('\nError pulling source')
 			printer.write('\n' + str(printErr,'utf-8'))
 
-class SfdxOpenScratchOrgCommand(sublime_plugin.TextCommand):
+class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
@@ -178,7 +178,7 @@ class SfdxOpenScratchOrgCommand(sublime_plugin.TextCommand):
 
 
 
-class SfdxCreateScratchOrgCommand(sublime_plugin.TextCommand):
+class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		self.def_file = os.path.join(self.dx_folder, 'config', 'project-scratch-def.json')
@@ -218,7 +218,7 @@ class SfdxCreateScratchOrgCommand(sublime_plugin.TextCommand):
 
 
 
-class SfdxAuthDevHubCommand(sublime_plugin.TextCommand):
+class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		printer.show()
 		printer.write('\nOpening auth page')
@@ -253,7 +253,7 @@ class SfdxAuthDevHubCommand(sublime_plugin.TextCommand):
 
 
 
-class SfdxCreateApexClassCommand(sublime_plugin.WindowCommand):
+class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
 	def run(self, paths = []):
 		if len(paths) != 1 or  (len(paths) > 0 and os.path.isfile(paths[0])):
 			printer.show()
@@ -303,7 +303,7 @@ class SfdxCreateApexClassCommand(sublime_plugin.WindowCommand):
 			printer.write('\n' + str(err,'utf-8'))
 
 
-class SfdxUpgradeProjectCommand(sublime_plugin.TextCommand):
+class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		printer.show()
 		printer.write('\nUpgrading project')
@@ -338,7 +338,7 @@ class SfdxUpgradeProjectCommand(sublime_plugin.TextCommand):
 
 
 
-class SfdxCreateProjectCommand(sublime_plugin.TextCommand):
+class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.edit = edit
 		self.project_name = ''

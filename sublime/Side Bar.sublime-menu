@@ -1,20 +1,16 @@
 [
 	{
-	    "id" : "sfdx",
-	    "caption" : "sfdx",
+	    "id" : "dxmate",
+	    "caption" : "DXMate",
 	    "children": 
 	    	[
-	    		
-	    					{
-	    						"caption" : "Create Apex Class",
-	    						"command": "sfdx_create_apex_class",
-	    						"args" : {
-	    							"paths":[]
-	    						}
-	    					}
-	    				
-	    			
-	    		
+				{
+					"caption" : "Create Apex Class",
+					"command": "dxmate_create_apex_class",
+					"args" : {
+						"paths":[]
+					}
+				}
 	    	]
 	}
 ]

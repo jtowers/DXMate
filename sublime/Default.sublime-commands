@@ -1,30 +1,30 @@
 [
 	{
-		"caption": "sfdx: Create Project",
-		"command": "sfdx_create_project"
+		"caption": "dxmate: Create Project",
+		"command": "dxmate_create_project"
 	},
 	{
-	    "caption": "sfdx: Upgrade Project",
-	    "command": "sfdx_upgrade_project"
+	    "caption": "dxmate: Upgrade Project",
+	    "command": "dxmate_upgrade_project"
   	},
   	{
-		"caption": "sfdx: Authorize Dev Hub",
-		"command": "sfdx_auth_dev_hub"
+		"caption": "dxmate: Authorize Dev Hub",
+		"command": "dxmate_auth_dev_hub"
 	},
 	{
-		"caption": "sfdx: Create Scratch Org",
-		"command": "sfdx_create_scratch_org"
+		"caption": "dxmate: Create Scratch Org",
+		"command": "dxmate_create_scratch_org"
 	},
 	{
-		"caption": "sfdx: Open Scratch Org",
-		"command": "sfdx_open_scratch_org"
+		"caption": "dxmate: Open Scratch Org",
+		"command": "dxmate_open_scratch_org"
 	},
 	{
-		"caption": "sfdx: Push Source",
-		"command": "sfdx_push_source"
+		"caption": "dxmate: Push Source",
+		"command": "dxmate_push_source"
 	},
 	{
-		"caption": "sfdx: Pull Source",
-		"command": "sfdx_pull_source"
+		"caption": "dxmate: Pull Source",
+		"command": "dxmate_pull_source"
 	}
 ]

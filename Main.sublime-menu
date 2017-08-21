@@ -1,7 +1,7 @@
 [
 {
     "id" : "sfdx",
-    "caption" : "SFDX",
+    "caption" : "DXMate",
     "children":
 	    [
 	    	{
@@ -10,11 +10,11 @@
 	    		[
 	    			{
 			    		"caption": "Create Project",
-			    		"command" : "sfdx_create_project"
+			    		"command" : "dxmate_create_project"
 	    			},
 	    			{
 			    		"caption": "Upgrade Project",
-			    		"command" : "sfdx_upgrade_project"
+			    		"command" : "dxmate_upgrade_project"
 	    			}
 	    		]
 	    	},
@@ -24,7 +24,7 @@
 	    		[
 	    			{
 	    				"caption": "Authorize Dev Hub",
-	    				"command": "sfdx_auth_dev_hub"
+	    				"command": "dxmate_auth_dev_hub"
 	    			}
 	    		]
 	    	},
@@ -34,11 +34,11 @@
 	    		[
 	    			{
 	    				"caption": "Create Scratch Org",
-	    				"command": "sfdx_create_scratch_org"
+	    				"command": "dxmate_create_scratch_org"
 	    			},
 	    			{
 						"caption": "Open Scratch Org",
-						"command": "sfdx_open_scratch_org"
+						"command": "dxmate_open_scratch_org"
 					}
 	    		]
 	    	},
@@ -48,11 +48,11 @@
 	    		[
 	    			{
 	    				"caption": "Push Source",
-	    				"command": "sfdx_push_source"
+	    				"command": "dxmate_push_source"
 	    			},
 	    			{
 						"caption": "Pull Source",
-						"command": "sfdx_pull_source"
+						"command": "dxmate_pull_source"
 					}
 	    		]
 	    	}
