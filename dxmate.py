@@ -190,9 +190,14 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
-		printer.write('\nPushing source')
+		printer.write('\nPushing Source')
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Pushing Source', 'Source Pushed')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Source Pushed')
 	
 	def is_enabled(self):
 		self.dx_folder = dxProjectFolder()
@@ -227,9 +232,14 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
-		printer.write('\nPulling source')
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Pulling Source', 'Source Pulled')
+		printer.write('\nPulling Source')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Source Pulled')
 	
 	def is_enabled(self):
 		self.dx_folder = dxProjectFolder()
@@ -264,9 +274,14 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
 		printer.show()
-		printer.write('\nOpening org')
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Opening Org', 'Org Opened')
+		printer.write('\nOpening Org')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Org Opened')
 	
 	def is_enabled(self):
 		self.dx_folder = dxProjectFolder()
@@ -303,10 +318,15 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 		
 	def create_org(self, input):
 		printer.show()
-		printer.write('\nCreating scratch org')
 		self.def_file = input;
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Creating Scratch Org', 'Scratch Org Created')
+		printer.write('\nCreatin Scratch Org')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Scratch Org Created')
 
 	def is_enabled(self):
 		self.dx_folder = dxProjectFolder()
@@ -338,9 +358,14 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		printer.show()
-		printer.write('\nOpening auth page')
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Opening Auth Page', 'Auth Page Opened')
+		printer.write('\nOpening Auth Page')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Auth Page Opened')
 
 	def is_enabled(self):
 		dx_folder = dxProjectFolder()
@@ -393,9 +418,14 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
 	def create_class(self, input):
 		self.class_name = input
 		printer.show()
-		printer.write('\nCreating apex class')
 		t = threading.Thread(target = self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Creating Apex Class', 'Apex Class Created')
+		printer.write('\nCreating Apex Class')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Apex Class Created')
 
 	def run_command(self):
 		dx_folder = dxProjectFolder()
@@ -423,9 +453,14 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
 class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		printer.show()
-		printer.write('\nUpgrading project')
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Upgrading Project', 'Project Upgraded')
+		printer.write('\nUpgrading Project')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Project Upgraded')
 
 	def is_enabled(self):
 		dx_folder = dxProjectFolder()
@@ -478,10 +513,15 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
 
 	def create_project(self, input):
 		printer.show()
-		printer.write('\nCreating project')
 		self.namespace = input
 		t = threading.Thread(target=self.run_command)
 		t.start()
+		t.printer = printer
+		t.process_id  = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+		ThreadProgress(t, 'Creating Project', 'Project Created')
+		printer.write('\nCreating Project')
+		printer.write('\nResult: ')
+		PanelThreadProgress(t, 'Project Created')
 	
 	def run_command(self):
 		args = ['sfdx', 'force:project:create', '-n', self.project_name, '-t', self.template, '-d', self.project_path]
@@ -504,6 +544,3 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
 		else:
 			printer.write('\nError creating project:')
 			printer.write('\n' + t)
-
-
-		
