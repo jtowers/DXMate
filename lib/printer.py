@@ -16,7 +16,7 @@ class PanelPrinter(object):
     printers = {}
 
     def __init__(self):
-        self.name = 'sfdx-OutputPanel'
+        self.name = 'dxmate-OutputPanel'
         self.visible = False
         self.queue = []
         self.strings = {}
@@ -45,7 +45,7 @@ class PanelPrinter(object):
         string = str(string)
         self.reset_hide()
         self.just_error = True
-        sublime.error_message('sfdx: ' + string)
+        sublime.error_message('dxmate: ' + string)
 
     def hide(self, thread = None):
         hide = False
@@ -98,7 +98,7 @@ class PanelPrinter(object):
                 string = string+"\n"
             self.strings[key].append(string)
 
-    def write(self, string, key = 'sublime_sfdx', finish = False, erase = False):
+    def write(self, string, key = 'sublime_dxmate', finish = False, erase = False):
         self.erase = erase
         if not len(string) and not finish:
             return
@@ -113,7 +113,7 @@ class PanelPrinter(object):
         sublime.set_timeout(self.write_callback, 0)
         return key
 
-    def writeln(self, string, key = 'sublime_sfdx', finish = False):
+    def writeln(self, string, key = 'sublime_dxmate', finish = False):
         if not len(string) and not finish:
             return
         if key not in self.strings:
@@ -140,7 +140,7 @@ class PanelPrinter(object):
             if not found:
                 return
             string = self.strings[key].pop(0)
-            self.panel.run_command('sfdx_output_text', {'text': string, 'erase': self.erase})
+            self.panel.run_command('dxmate_output_text', {'text': string, 'erase': self.erase})
 
             size = self.panel.size()
             sublime.set_timeout(lambda : self.panel.show(size, True), 2)
@@ -165,7 +165,7 @@ class PanelPrinter(object):
                         self.panel.erase_regions(key)
                         keys_to_erase.append(key)
                         continue
-                    if key == 'sublime_sfdx':
+                    if key == 'sublime_dxmate':
                         point = self.panel.size()
                     else:
                         regions = self.panel.get_regions(key)
@@ -177,7 +177,7 @@ class PanelPrinter(object):
                     if point == 0 and string[0] == '\n':
                         string = string[1:]
                     self.panel.insert(edit, point, string)
-                    if key != 'sublime_sfdx':
+                    if key != 'sublime_dxmate':
                         point = point + len(string) - 1
                         region = sublime.Region(point, point)
                         self.panel.add_regions(key, [region], '')

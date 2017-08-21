@@ -19,6 +19,16 @@
 	    		]
 	    	},
 	    	{
+	    		"caption": "Apex",
+	    		"children": 
+	    		[
+	    			{
+	    				"caption": "Run Org Tests",
+	    				"command": "dxmate_run_org_tests"
+	    			}
+	    		]
+	    	},
+	    	{
 	    		"caption": "Auth",
 	    		"children": 
 	    		[

@@ -69,6 +69,44 @@ active_window_id = sublime.active_window().id()
 printer = PanelPrinter.get(active_window_id)
 printer.write("sfdx plugin loaded", erase = True)
 
+class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		self.dx_folder = dxProjectFolder()
+		printer.show()
+		printer.write('\nRunning Org Tests')
+		t = threading.Thread(target=self.run_command)
+		t.start()
+	
+	def is_enabled(self):
+		self.dx_folder = dxProjectFolder()
+		if self.dx_folder == '':
+			return False
+		return True
+
+	def run_command(self):
+		args = ['sfdx', 'force:apex:test:run', '-r', 'human', '-u', 'DevHub']
+		startupinfo = None
+		if os.name == 'nt':
+		    startupinfo = subprocess.STARTUPINFO()
+		    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.PIPE, startupinfo=startupinfo, cwd=self.dx_folder)
+		
+		p.wait()
+
+		out,err = p.communicate()
+		r = p.returncode
+		print(r)
+		if p.returncode == 0:
+			printer.write('\n' + str(out,'utf-8'))
+		else:
+			printErr = err
+			if not err is None and not err == '':
+				printErr = out
+			else:
+				printer.write('\nError running tests')
+			printer.write('\n' + str(printErr,'utf-8'))
+
+
 class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 		self.dx_folder = dxProjectFolder()
