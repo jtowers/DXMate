@@ -10,26 +10,28 @@ from dxmate.lib.threads import PanelThreadProgress
 import ntpath
 
 def dxProjectFolder():
-	open_folders = sublime.active_window().folders()
-	for folder in open_folders:
-		for root, dirs, files in os.walk(folder, topdown=False):
-			for name in files:
-				if name == 'sfdx-project.json':
-					return folder
-	return ''
+	for window in sublime.windows():
+		open_folders = window.folders()
+		for folder in open_folders:
+			for root, dirs, files in os.walk(folder, topdown=False):
+				for name in files:
+					if name == 'sfdx-project.json':
+						return folder
+		return ''
 
 
 class LanguageServer:
 
-	UBER_JAR_NAME = os.path.join(sublime.packages_path(), 'sfdx', 'apex-jorje-lsp.jar')
+	UBER_JAR_NAME = 'apex-jorje-lsp.jar'
 	JDWP_DEBUG_PORT = 2739
 	APEX_LANGUAGE_SERVER_MAIN = 'apex.jorje.lsp.ApexLanguageServerLauncher'
 		
 	def createServer(self):
-		self.deleteDbIfExists()
-		uberJar = os.path.join(sublime.packages_path(), 'salesforce-dx', self.UBER_JAR_NAME)
-		args = ['javaw', '-cp', uberJar, '-Ddebug.internal.errors=true','-Ddebug.semantic.errors=false', self.APEX_LANGUAGE_SERVER_MAIN]
-		p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+		if(dxProjectFolder() != ''):
+			self.deleteDbIfExists()
+			uberJar = os.path.join(sublime.packages_path(), 'dxmate', self.UBER_JAR_NAME)
+			args = ['javaw', '-cp', uberJar, '-Ddebug.internal.errors=true','-Ddebug.semantic.errors=false', self.APEX_LANGUAGE_SERVER_MAIN]
+			p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr = subprocess.STDOUT, cwd=dxProjectFolder())
 		
 
 
@@ -83,13 +85,16 @@ class WriteOperationStatus(sublime_plugin.TextCommand):
     def description(self):
         return
 
-#not ready for code completion yet		
-#ls = LanguageServer()
-#ls.createServer()
-
-active_window_id = sublime.active_window().id()
-printer = PanelPrinter.get(active_window_id)
-printer.write("sfdx plugin loaded", erase = True)
+ls = LanguageServer()
+printer = None
+def plugin_loaded():
+	global ls
+	global printer
+	# not ready for language services yet
+	#ls.createServer()
+	active_window_id = sublime.active_window().id()
+	printer = PanelPrinter.get(active_window_id)
+	printer.write("sfdx plugin loaded", erase = True)
 
 class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
 	def run(self):
