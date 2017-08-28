@@ -1,0 +1,712 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"plugin",
+				"plugin_loaded"
+			],
+			[
+				"type",
+				"typescript"
+			],
+			[
+				"t",
+				"testMe"
+			],
+			[
+				"file_e",
+				"file_ext"
+			],
+			[
+				"sublime",
+				"sublime_plugin"
+			],
+			[
+				"S",
+				"Schema\t7"
+			],
+			[
+				"auto",
+				"autocomplete_triggers"
+			],
+			[
+				"format",
+				"format_completion"
+			],
+			[
+				"Apex",
+				"ApexClassName2()\tvoid ApexClassName2()"
+			],
+			[
+				"Sy",
+				"List<System.JSONToken>"
+			],
+			[
+				"th",
+				"Reports.ThresholdInformation"
+			],
+			[
+				"ad",
+				"Address"
+			],
+			[
+				"d",
+				"dynSoql\tDynamic Query with all the Fields"
+			],
+			[
+				"active",
+				"active_file_extension"
+			],
+			[
+				"active_fil",
+				"active_file_extension"
+			],
+			[
+				"documen",
+				"document_sync"
+			],
+			[
+				"ls",
+				"lsClient"
+			],
+			[
+				"dx",
+				"dxProjectFolder"
+			],
+			[
+				"complet",
+				"completionProvider"
+			],
+			[
+				"A",
+				"APEX_LANGUAGE_SERVER_MAIN"
+			],
+			[
+				"creat",
+				"createServerThread"
+			],
+			[
+				"file",
+				"file_extension"
+			],
+			[
+				"acti",
+				"active_file"
+			],
+			[
+				"thread",
+				"ThreadProgress"
+			],
+			[
+				"def",
+				"def_file"
+			],
+			[
+				"class_",
+				"class_name"
+			],
+			[
+				"run",
+				"run_command"
+			],
+			[
+				"class",
+				"class_name"
+			],
+			[
+				"dxfo",
+				"dxProjectFolder"
+			],
+			[
+				"sfdx-",
+				"sfdx-OutputPanel"
+			],
+			[
+				"proj",
+				"project_path"
+			],
+			[
+				"name",
+				"namespace"
+			],
+			[
+				"del",
+				"deleteDbIfExists"
+			],
+			[
+				"l",
+				"languageServer"
+			],
+			[
+				"opp",
+				"Opportunity"
+			],
+			[
+				"for",
+				"fore\tIterator-based FOR loop"
+			],
+			[
+				"op",
+				"Opportunity"
+			],
+			[
+				"asset",
+				"assertEquals()"
+			],
+			[
+				"assert",
+				"assertEquals()"
+			],
+			[
+				"ye",
+				"PUBLIC addYears(Integer years) \tDate"
+			],
+			[
+				"Opp",
+				"Opportunity"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "typescript/main.py",
+			"settings":
+			{
+				"buffer_size": 2461,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 79 files for \"Path of tsserver.js\"\n\nC:\\Users\\jtowers\\AppData\\Roaming\\Sublime Text 3\\Packages\\dxmate\\typescript\\typescript\\libs\\editor_client.py:\n   59              proc_file = os.path.join(PLUGIN_DIR, \"tsserver\", \"tsserver.js\")\n   60              global_vars._tsc_path = os.path.join(PLUGIN_DIR, \"tsserver\", \"tsc.js\")\n   61:         print(\"Path of tsserver.js: \" + proc_file)\n   62          print(\"Path of tsc.js: \" + get_tsc_path())\n   63  \n\n1 match in 1 file\n",
+			"settings":
+			{
+				"buffer_size": 471,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "typescript/typescript/libs/editor_client.py",
+			"settings":
+			{
+				"buffer_size": 3261,
+				"encoding": "UTF-8 with BOM",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "typescript/typescript/libs/node_client.py",
+			"settings":
+			{
+				"buffer_size": 11635,
+				"encoding": "UTF-8 with BOM",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 230.0,
+		"last_filter": "package control install",
+		"selected_items":
+		[
+			[
+				"package control install",
+				"Package Control: Install Package"
+			],
+			[
+				"package control disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"yapf",
+				"PyYapf: Format Document"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"python",
+				"User: Python PEP8 Autoformat"
+			],
+			[
+				"Package Control: disabl",
+				"Package Control: Disable Package"
+			],
+			[
+				"Package Control:  sat",
+				"Package Control: Satisfy Dependencies"
+			],
+			[
+				"remove pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"lsp",
+				"LSP: Show Diagnostics"
+			],
+			[
+				"ls",
+				"LSP: Show Diagnostics"
+			],
+			[
+				"push",
+				"dxmate: Push Source"
+			],
+			[
+				"package co",
+				"Package Control: Disable Package"
+			],
+			[
+				"sfdx pull",
+				"sfdx: Pull Source"
+			],
+			[
+				"sfdx",
+				"sfdx: Open Scratch Org"
+			],
+			[
+				"sfdx ",
+				"sfdx: Create Scratch Org"
+			],
+			[
+				"new",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"run apex",
+				"MavensMate: Run Apex Tests..."
+			],
+			[
+				"refresh",
+				"MavensMate: Refresh Apex Code Symbols"
+			],
+			[
+				"new apex",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"material them",
+				"Material Theme: Activate theme"
+			]
+		],
+		"width": 926.0
+	},
+	"console":
+	{
+		"height": 287.0,
+		"history":
+		[
+			"view.run_command('delete_db')",
+			"view.run_command('example')",
+			"view.run_command('deletedb')",
+			"view.run_command('delete_db')",
+			"view.run_command('delete-db')",
+			"view.run_command('example')",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/typescript",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/typescript/typescript",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/typescript/typescript/libs"
+	],
+	"file_history":
+	[
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/typescript/Comments.tmPreferences",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/typescript/typescript/libs/view_helpers.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/TypeScript/main.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/TypeScript/typescript/commands/__init__.py",
+		"/C/Users/jtowers/Desktop/test.ts",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/jtowers/Downloads/sfdx-test/sfdx-test/force-app/main/default/classes/ApexClassName2.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/User/PyYapf.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/PyYapf Python Formatter/PyYapf.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/Python PEP8 Autoformat/pep8_autoformat.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/User/pep8_autoformat.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/lib/lsp.py",
+		"/C/Users/jtowers/Downloads/sfdx-test/sfdx-test/force-app/main/default/classes/ApexClassName.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/LSP/main.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/TypeScript/typescript/libs/node_client.py",
+		"/C/Users/jtowers/AppData/Local/Temp/7zO863F2D95/Crypto.cls",
+		"/C/Users/jtowers/AppData/Local/Temp/7zO863F12F4/Action.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/TypeScript/tsserver/lib.es2015.collection.d.ts",
+		"/C/Users/jtowers/Downloads/test_lib/node_client.py",
+		"/C/Users/jtowers/Downloads/test_lib/reference.py",
+		"/C/Users/jtowers/Downloads/test_lib/editor_client.py",
+		"/C/Users/jtowers/test_project/force-app/main/default/classes/ApexClassName.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/lib/util.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/lib/languageServer.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/dxmate.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/LSP/LSP.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/sublime/Context.sublime-menu",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/sublime/Default.sublime-commands",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/sublime/Side Bar.sublime-menu",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/README.md",
+		"/C/Users/jtowers/test_project/force-app/main/default/classes/ApexClassName2.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/MavensMate/README.md",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/lib/threads.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/lib/printer.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/sublime/lang/Apex.sublime-syntax",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/sublime/lang/Apex.tmPreferences.xml",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/MavensMate/mavensmate.sublime-settings",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/.no-sublime-package",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/dxmate/Main.sublime-menu",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/sublime/Default.sublime-commands",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/Main.sublime-menu",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/sublime/Side Bar.sublime-menu",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/sfdx.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/lib/printer.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/lib/threads.py",
+		"/C/Users/jtowers/test_project/force-app/main/default/classes/ApexClassName/.cls",
+		"/C/Users/jtowers/test_project/force-app/main/default/classes/ApexClassName",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/Default.sublime-commands",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/Contact_RollupToHousehold.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/sfdx/lib/languageServer.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/salesforce-dx/languageServer.py",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/salesforce-dx/sfdx.py",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/ContactHandler.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/Organization_YTDDonationsRollup_Tests.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/Opportunity_RollupToAccount.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/DataFactory.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/Organization_ScheduleRollup.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/OpportunityHandler_Tests.cls",
+		"/C/Users/jtowers/Documents/IJPC/src/classes/ContactHandler_Tests.cls",
+		"/C/Users/jtowers/AppData/Roaming/Sublime Text 3/Packages/SublimeAStyleFormatter/SublimeAStyleFormatter.sublime-settings"
+	],
+	"find":
+	{
+		"height": 88.0
+	},
+	"find_in_files":
+	{
+		"height": 198.0,
+		"where_history":
+		[
+			"C:\\Users\\jtowers\\AppData\\Roaming\\Sublime Text 3\\Packages\\dxmate"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"script_path",
+			"Path of tsserver.js",
+			"get_ref_View",
+			"ref view"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "typescript/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2461,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1287,
+								1299
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1427.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 471,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										350,
+										369
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								142,
+								142
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "typescript/typescript/libs/editor_client.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3261,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1484,
+								1496
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1109.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "typescript/typescript/libs/node_client.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11635,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								709,
+								709
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 664.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 35.0
+	},
+	"input":
+	{
+		"height": 83.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.MavensMate-OutputPanel":
+	{
+		"height": 188.0
+	},
+	"output.astyle_error_message":
+	{
+		"height": 0.0
+	},
+	"output.diagnostics":
+	{
+		"height": 194.0
+	},
+	"output.doc":
+	{
+		"height": 0.0
+	},
+	"output.dxmate-OutputPanel":
+	{
+		"height": 188.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sfdx-OutputPanel":
+	{
+		"height": 188.0
+	},
+	"output.sfdx-panel":
+	{
+		"height": 0.0
+	},
+	"output.sfdx-project-panel":
+	{
+		"height": 188.0
+	},
+	"pinned_build_system": "",
+	"project": "project.sublime-project",
+	"replace":
+	{
+		"height": 65.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"contacthan",
+				"src\\classes\\ContactHandler.cls"
+			],
+			[
+				"contacthandler",
+				"src\\classes\\ContactHandler_Tests.cls"
+			],
+			[
+				"datafa",
+				"src\\classes\\DataFactory.cls"
+			],
+			[
+				"data",
+				"src\\classes\\DataFactory.cls"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 350.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

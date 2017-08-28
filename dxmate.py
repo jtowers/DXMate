@@ -11,7 +11,8 @@ from collections import OrderedDict
 from dxmate.lib.printer import PanelPrinter
 from dxmate.lib.threads import ThreadProgress
 from dxmate.lib.threads import PanelThreadProgress
-import dxmate.lib.languageServer as languageServer
+import dxmate.typescript.main as typescriptMain
+from dxmate.typescript.typescript.listeners import *
 import dxmate.lib.util as util
 import ntpath
 
@@ -122,9 +123,11 @@ def plugin_loaded():
     global lsClient
     global printer
     if util.dxProjectFolder() != '':
-        lsClient = languageServer.start_client()
-        if lsClient is None:
-            util.debug('Can\'t start client')
+        util.debug('start completion stuff')
+
+        #lsClient = languageServer.start_client()
+        # if lsClient is None:
+        #util.debug('Can\'t start client')
 
     active_window_id = sublime.active_window().id()
     printer = PanelPrinter.get(active_window_id)
@@ -134,84 +137,6 @@ def plugin_loaded():
 def plugin_unloaded():
     if not lsClient is None:
         lsClient.kill()
-
-
-class ExitHandler(sublime_plugin.EventListener):
-
-    def on_window_commad(self, window, command_name, args):
-        if command_name == 'exit':
-            plugin_unloaded()
-
-
-class CompletionHandler(sublime_plugin.EventListener):
-
-    def __init__(self):
-        self.completions = []  # type: List[Tuple[str, str]]
-        self.refreshing = False
-
-    def on_query_completions(self, view, prefix, locations):
-        active_file_extension = util.active_file_extension()
-        if active_file_extension != '.cls' and active_file_extension != '.trigger':
-            return None
-
-        if not self.refreshing:
-            client = lsClient
-
-            if not client:
-                return
-
-            completionProvider = client.get_capability('completionProvider')
-            if not completionProvider:
-                return
-
-            autocomplete_triggers = completionProvider.get('triggerCharacters')
-            if locations[0] > 0:
-                self.completions = []
-            print('at char - continue')
-            util.purge_did_change(view.buffer_id())
-            client.send_request(
-                languageServer.Request.complete(
-                    util.get_document_position(view, locations[0])),
-                self.handle_response)
-            util.debug('sending completion request')
-        self.refreshing = False
-        return self.completions, (sublime.INHIBIT_WORD_COMPLETIONS
-                                  | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
-    def format_completion(self, item) -> 'Tuple[str, str]':
-        label = item.get("label")
-        # kind = item.get("kind")
-        detail = item.get("kind")
-        detail = format_symbol_kind(detail)
-        #detail = format_symbol(detail)
-        insertText = label
-        if item.get("insertTextFormat") == 2:
-            insertText = item.get("insertText")
-        if insertText[0] == '$':  # sublime needs leading '$' escaped.
-            insertText = '\$' + insertText[1:]
-        return ("{}\t{}".format(label, detail), insertText)
-
-    def handle_response(self, response):
-        self.completions = []
-        items = response["items"] if isinstance(response,
-                                                dict) else response
-        util.debug('items', items)
-        for item in items:
-            self.completions.append(self.format_completion(item))
-        util.debug('completions: ', self.completions)
-        sublime.active_window().active_view().run_command('hide_auto_complete')
-        self.run_auto_complete()
-
-    def run_auto_complete(self):
-        util.debug('running autocomplete')
-        self.refreshing = True
-        sublime.active_window().active_view().run_command(
-            "auto_complete", {
-                'disable_auto_insert': True,
-                'api_completions_only': False,
-                'next_completion_if_showing': False,
-                'auto_complete_commit_on_tab': True,
-            })
 
 
 class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):

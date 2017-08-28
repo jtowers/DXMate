@@ -1,0 +1,10 @@
+public with sharing class ApexClassName {
+  public ApexClassName() {
+    
+
+  }
+
+  private void testMe() {
+    System.debug('test');
+  }
+}
