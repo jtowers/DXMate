@@ -14,16 +14,13 @@ def plugin_name():
 
 
 def dxProjectFolder():
-    # find the first dx project folder in any open window
-    # should probably update this to keep track of all open projects
-    for window in sublime.windows():
-        open_folders = window.folders()
-        for folder in open_folders:
-            for root, dirs, files in os.walk(folder, topdown=False):
-                for name in files:
-                    if name == 'sfdx-project.json':
-                        return folder
-    return '' 
+    open_folders = sublime.active_window().folders()
+    for folder in open_folders:
+        for root, dirs, files in os.walk(folder, topdown=False):
+            for name in files:
+                if name == 'sfdx-project.json':
+                    return folder
+    return ''
 
 
 def active_file():
@@ -37,8 +34,6 @@ def active_file_extension():
 
 
 def file_extension(view):
-    if view is None:
-        return ''
     file_name, file_extension = os.path.splitext(view.file_name())
     return file_extension
 
@@ -85,24 +80,6 @@ def debug(*args):
 
 
 pending_buffer_changes = dict()  # type: Dict[int, Dict]
-
-
-def queue_did_change(view: sublime.View):
-    buffer_id = view.buffer_id()
-    buffer_version = 1
-    pending_buffer = None
-    if buffer_id in pending_buffer_changes:
-        pending_buffer = pending_buffer_changes[buffer_id]
-        buffer_version = pending_buffer["version"] + 1
-        pending_buffer["version"] = buffer_version
-    else:
-        pending_buffer_changes[buffer_id] = {
-            "view": view,
-            "version": buffer_version
-        }
-
-    sublime.set_timeout_async(
-        lambda: purge_did_change(buffer_id, buffer_version), 500)
 
 
 def purge_did_change(buffer_id: int, buffer_version=None):

@@ -11,8 +11,6 @@ from urllib.parse import urlparse
 from urllib.request import pathname2url
 from urllib.request import url2pathname
 
-client = None
-
 
 def format_request(payload: 'Dict[str, Any]'):
     """Converts the request into json and adds the Content-Length header"""
@@ -281,62 +279,15 @@ class Client(object):
             util.debug("Unhandled notification:", method)
 
 
-class Events:
-    listener_dict = dict()  # type: Dict[str, Callable[..., None]]
-
-    @classmethod
-    def subscribe(cls, key, listener):
-        if key in cls.listener_dict:
-            cls.listener_dict[key].append(listener)
-        else:
-            cls.listener_dict[key] = [listener]
-        return lambda: cls.unsubscribe(key, listener)
-
-    @classmethod
-    def unsubscribe(cls, key, listener):
-        if key in cls.listener_dict:
-            cls.listener_dict[key].remove(listener)
-
-    @classmethod
-    def publish(cls, key, *args):
-        if key in cls.listener_dict:
-            for listener in cls.listener_dict[key]:
-                listener(*args)
-
-document_sync_initialized = False
-
-
-def notify_did_open(view: sublime.View):
-    if client:
-        params = {
-            "textDocument": {
-                "uri": filename_to_uri(view.file_name()),
-                "languageId": config.languageId,
-                "text": view.substr(sublime.Region(0, view.size()))
-            }
-        }
-        client.send_notification(Notification.didOpen(params))
-
-
-def notify_did_save(view: sublime.View):
-    if client:
-        params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
-        client.send_notification(Notification.didSave(params))
-
-
-def notify_did_close(view: sublime.View):
-    params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
-    client.send_notification(Notification.didClose(params))
-
-
 def initialize_document_sync(text_document_sync_kind):
     global document_sync_initialized
     if document_sync_initialized:
         return
     document_sync_initialized = True
+    # TODO: hook up events per scope/client
     Events.subscribe('view.on_load_async', notify_did_open)
     Events.subscribe('view.on_activated_async', notify_did_open)
-    Events.subscribe('view.on_modified_async', util.queue_did_change)
+    Events.subscribe('view.on_modified_async', queue_did_change)
     Events.subscribe('view.on_post_save_async', notify_did_save)
     Events.subscribe('view.on_close', notify_did_close)
 
@@ -413,16 +364,14 @@ def start_server():
 
 
 def start_client():
-    global client
     client = start_server()
     if not client:
         print("Could not start language server")
         return
-    project_uri = filename_to_uri(util.dxProjectFolder())
-    print('project_uri ', project_uri)
+
     initializeParams = {
         "processId": client.process.pid,
-        "rootUri": project_uri,
+        "rootUri": filename_to_uri(util.dxProjectFolder()),
         "capabilities": {
             "textDocument": {
                 "completion": {
