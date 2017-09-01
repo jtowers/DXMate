@@ -115,9 +115,6 @@ lsClient = None
 printer = None
 
 
-def handle_response(response):
-    debug('response', response)
-
 
 def plugin_loaded():
     global lsClient
@@ -125,7 +122,7 @@ def plugin_loaded():
     if dxProjectFolder() != '':
         lsClient = start_client()
         if lsClient is None:
-            debug('Can\'t start client')
+            debug('Unable start langauge server')
 
     active_window_id = sublime.active_window().id()
     printer = PanelPrinter.get(active_window_id)
@@ -133,7 +130,8 @@ def plugin_loaded():
 
 
 def plugin_unloaded():
-    handle_close()
+    if lsClient:
+        lsClient.kill()
 
 
 class ExitHandler(sublime_plugin.EventListener):
@@ -152,11 +150,21 @@ class EventHandlers(sublime_plugin.EventListener):
     def on_pre_close(self, view):
         EventHub.publish('on_pre_close')
 
+
+    def on_close(self, view):
+        EventHub.publish('on_close', view)
+    def on_load_async(self, view):
+        EventHub.publish('on_load_async', view)
+    def on_activated_async(self, view):
+        EventHub.publish('on_activated_async', view)
+    def on_post_save_async(self, view):
+        EventHub.publish('on_post_save_async', view)
+    def on_close(self, view):
+        EventHub.publish('on_close', view)
     def on_modified_async(self, view):
         active_file_extension = file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
             return None
-        debug('modified document')
         EventHub.publish("on_modified_async", view)
 
     def on_query_completions(self, view, prefix, locations):
@@ -182,7 +190,6 @@ class EventHandlers(sublime_plugin.EventListener):
                 Request.complete(
                     get_document_position(view, locations[0])),
                 self.handle_response)
-            debug('sending completion request')
         self.refreshing = False
         return self.completions, (sublime.INHIBIT_WORD_COMPLETIONS
                                   | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
@@ -204,15 +211,12 @@ class EventHandlers(sublime_plugin.EventListener):
         self.completions = []
         items = response["items"] if isinstance(response,
                                                 dict) else response
-        debug('items', items)
         for item in items:
             self.completions.append(self.format_completion(item))
-        debug('completions: ', self.completions)
         sublime.active_window().active_view().run_command('hide_auto_complete')
         self.run_auto_complete()
 
     def run_auto_complete(self):
-        debug('running autocomplete')
         self.refreshing = True
         sublime.active_window().active_view().run_command(
             "auto_complete", {
@@ -357,7 +361,6 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\n' + str(out, 'utf-8'))
         else:
@@ -402,7 +405,6 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\n' + str(out, 'utf-8'))
         else:
@@ -447,7 +449,6 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nScratch org opened')
         else:
@@ -496,7 +497,6 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nScratch org created')
         else:
@@ -537,7 +537,6 @@ class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nDevHub authorized')
         else:
@@ -560,7 +559,6 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
 
     def is_enabled(self, paths=[]):
         dx_folder = dxProjectFolder()
-        print(dx_folder)
         if(dx_folder == ''):
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
@@ -594,7 +592,6 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nApex class created')
             file = os.path.join(self.class_dir, self.class_name + '.cls')
@@ -637,7 +634,6 @@ class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
 
         out, err = p.communicate()
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nProject upgraded')
         else:
@@ -700,7 +696,6 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
 
         t = p.communicate()[0]
         r = p.returncode
-        print(r)
         if p.returncode == 0:
             printer.write('\nProject created')
         else:

@@ -8,8 +8,20 @@ from urllib.request import url2pathname
 from collections import OrderedDict
 from .languageServer import *
 from .event_hub import EventHub
-debug = True
+import json
 
+settings = None
+
+def load_settings():
+    return sublime.load_settings('dxmate.sublime-settings')
+
+def get_setting(setting):
+    global settings
+    if settings is None:
+        settings = load_settings()
+    if not settings is None:
+        return settings.get(setting)
+    return ''
 
 def plugin_name():
     return 'dxmate'
@@ -78,20 +90,33 @@ def get_document_position(view, point):
     dp = OrderedDict()  # type: Dict[str, Any]
     dp["textDocument"] = {"uri": uri}
     dp["position"] = position
-    debug('position:', dp)
     return dp
 
 
 def debug(*args):
     """Print args to the console if the "debug" setting is True."""
-    if debug:
-        print(*args)
+    if get_setting('debug'):
+        print(plugin_name(), ': ', *args)
 
 
 def handle_close():
     if dxProjectFolder() == '':
         client.kill()
 
+
+def format_request(payload: 'Dict[str, Any]'):
+    """Converts the request into json and adds the Content-Length header"""
+    content = json.dumps(payload, sort_keys=False)
+    content_length = len(content)
+    result = "Content-Length: {}\r\n\r\n{}".format(content_length, content)
+    return result
+
+def filename_to_uri(path: str) -> str:
+    return urljoin('file:', pathname2url(path))
+
+
+def uri_to_filename(uri: str) -> str:
+    return url2pathname(urlparse(uri).path)
 
 EventHub.subscribe('on_pre_close', handle_close)
 
