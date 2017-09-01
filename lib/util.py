@@ -6,6 +6,8 @@ from urllib.parse import urlparse
 from urllib.request import pathname2url
 from urllib.request import url2pathname
 from collections import OrderedDict
+from .languageServer import *
+from .event_hub import EventHub
 debug = True
 
 
@@ -14,14 +16,20 @@ def plugin_name():
 
 
 def dxProjectFolder():
-    open_folders = sublime.active_window().folders()
-    for folder in open_folders:
-        for root, dirs, files in os.walk(folder, topdown=False):
-            for name in files:
-                if name == 'sfdx-project.json':
-                    return folder
+    for window in sublime.windows():
+        open_folders = window.folders()
+        for folder in open_folders:
+            for root, dirs, files in os.walk(folder, topdown=False):
+                for name in files:
+                    if name == 'sfdx-project.json':
+                        return folder
     return ''
 
+
+def run_events():
+    if dxProjectFolder() != '':
+        return True
+    return False
 
 def active_file():
     return sublime.active_window().active_view().file_name()
@@ -34,8 +42,9 @@ def active_file_extension():
 
 
 def file_extension(view):
-    file_name, file_extension = os.path.splitext(view.file_name())
-    return file_extension
+    if view and view.file_name():
+        file_name, file_extension = os.path.splitext(view.file_name())
+        return file_extension
 
 
 def get_plugin_folder():
@@ -79,15 +88,11 @@ def debug(*args):
         print(*args)
 
 
-pending_buffer_changes = dict()  # type: Dict[int, Dict]
+def handle_close():
+    if dxProjectFolder() == '':
+        client.kill()
 
 
-def purge_did_change(buffer_id: int, buffer_version=None):
-    if buffer_id not in pending_buffer_changes:
-        return
+EventHub.subscribe('on_pre_close', handle_close)
 
-    pending_buffer = pending_buffer_changes.get(buffer_id)
 
-    if pending_buffer:
-        if buffer_version is None or buffer_version == pending_buffer["version"]:
-            notify_did_change(pending_buffer["view"])

@@ -2,7 +2,8 @@ import sublime
 import sublime_plugin
 import os
 import subprocess
-import dxmate.lib.util as util
+from .util import *
+from .event_hub import EventHub
 import threading
 import json
 from collections import OrderedDict
@@ -11,6 +12,7 @@ from urllib.parse import urlparse
 from urllib.request import pathname2url
 from urllib.request import url2pathname
 
+client = None
 
 def format_request(payload: 'Dict[str, Any]'):
     """Converts the request into json and adds the Content-Length header"""
@@ -157,7 +159,7 @@ class Client(object):
         self.send_payload(request.to_payload(self.request_id))
 
     def send_notification(self, notification: Notification):
-        util.debug('notify: ' + notification.method)
+        debug('notify: ' + notification.method)
         self.send_payload(notification.to_payload())
 
     def kill(self):
@@ -169,7 +171,7 @@ class Client(object):
             self.process.stdin.write(bytes(message, 'UTF-8'))
             self.process.stdin.flush()
         except BrokenPipeError as e:
-            util.debug("client unexpectedly died:", e)
+            debug("client unexpectedly died:", e)
 
     def read_stdout(self):
         """
@@ -199,15 +201,15 @@ class Client(object):
                         payload = json.loads(content)
                         limit = min(len(content), 200)
                         if payload.get("method") != "window/logMessage":
-                            util.debug("got json: ", content[0:limit])
+                            debug("got json: ", content[0:limit])
                     except IOError:
-                        util.debug("Got a non-JSON payload: ", content)
+                        debug("Got a non-JSON payload: ", content)
                         continue
 
                     try:
                         if "error" in payload:
                             error = payload['error']
-                            util.debug("got error: ", error)
+                            debug("got error: ", error)
                             sublime.status_message(error.get('message'))
                         elif "method" in payload:
                             if "id" in payload:
@@ -217,9 +219,9 @@ class Client(object):
                         elif "id" in payload:
                             self.response_handler(payload)
                         else:
-                            util.debug("Unknown payload type: ", payload)
+                            debug("Unknown payload type: ", payload)
                     except Exception as err:
-                        util.debug("Error handling server content:", err)
+                        debug("Error handling server content:", err)
 
             except IOError:
                 printf("LSP stdout process ending due to exception: ",
@@ -228,7 +230,7 @@ class Client(object):
                 self.process = None
                 return
 
-        util.debug("LSP stdout process ended.")
+        debug("LSP stdout process ended.")
 
     def read_stderr(self):
         """
@@ -237,13 +239,13 @@ class Client(object):
         while self.process.poll() is None:
             try:
                 content = self.process.stderr.readline()
-                util.debug("(stderr): ", content.strip())
+                debug("(stderr): ", content.strip())
             except IOError:
                 utl.debug("LSP stderr process ending due to exception: ",
                           sys.exc_info())
                 return
 
-        util.debug("LSP stderr process ended.")
+        debug("LSP stderr process ended.")
 
     def response_handler(self, response):
         try:
@@ -252,9 +254,9 @@ class Client(object):
             if (self.handlers[handler_id]):
                 self.handlers[handler_id](result)
             else:
-                util.debug("No handler found for id" + response.get("id"))
+                debug("No handler found for id" + response.get("id"))
         except Exception as e:
-            util.debug("error handling response", handler_id)
+            debug("error handling response", handler_id)
             raise
 
     def request_handler(self, request):
@@ -263,7 +265,7 @@ class Client(object):
             apply_workspace_edit(sublime.active_window(),
                                  request.get("params"))
         else:
-            util.debug("Unhandled request", method)
+            debug("Unhandled request", method)
 
     def notification_handler(self, response):
         method = response.get("method")
@@ -276,9 +278,146 @@ class Client(object):
             server_log(self.process.args[0],
                        response.get("params").get("message"))
         else:
-            util.debug("Unhandled notification:", method)
+            debug("Unhandled notification:", method)
+
+def initialize_on_open(view: sublime.View):
+    global didopen_after_initialize
+    config = config_for_scope(view)
+    if config:
+        if config.name not in window_clients(view.window()):
+            didopen_after_initialize.append(view)
+            get_window_client(view, config)
 
 
+# TODO: this should be per-window ?
+document_states = {}  # type: Dict[str, DocumentState]
+
+
+class DocumentState:
+    """Stores version count for documents open in a language service"""
+    def __init__(self, path: str) -> 'None':
+        self.path = path
+        self.version = 0
+
+    def inc_version(self):
+        self.version += 1
+        return self.version
+
+
+def get_document_state(path: str) -> DocumentState:
+    if path not in document_states:
+        document_states[path] = DocumentState(path)
+    return document_states[path]
+
+def notify_did_open(view: sublime.View):
+    if client:
+        view.settings().set("show_definitions", False)
+        if view.file_name() not in document_states:
+            get_document_state(view.file_name())
+            params = {
+                "textDocument": {
+                    "uri": filename_to_uri(view.file_name()),
+                    "languageId": 'apex',
+                    "text": view.substr(sublime.Region(0, view.size()))
+                }
+            }
+            client.send_notification(Notification.didOpen(params))
+
+
+def notify_did_close(view: sublime.View):
+    if view.file_name() in document_states:
+        del document_states[view.file_name()]
+        if client:
+            params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
+            client.send_notification(Notification.didClose(params))
+
+
+def notify_did_save(view: sublime.View):
+    if view.file_name() in document_states:
+        if client:
+            params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
+            client.send_notification(Notification.didSave(params))
+    else:
+        debug('document not tracked', view.file_name())
+
+
+class Events:
+    listener_dict = dict()  # type: Dict[str, Callable[..., None]]
+
+    @classmethod
+    def subscribe(cls, key, listener):
+        if key in cls.listener_dict:
+            cls.listener_dict[key].append(listener)
+        else:
+            cls.listener_dict[key] = [listener]
+        return lambda: cls.unsubscribe(key, listener)
+
+    @classmethod
+    def unsubscribe(cls, key, listener):
+        if key in cls.listener_dict:
+            cls.listener_dict[key].remove(listener)
+
+    @classmethod
+    def publish(cls, key, *args):
+        if key in cls.listener_dict:
+            for listener in cls.listener_dict[key]:
+                listener(*args)
+
+
+pending_buffer_changes = dict()  # type: Dict[int, Dict]
+
+
+def purge_did_change(buffer_id: int, buffer_version=None):
+    if buffer_id not in pending_buffer_changes:
+        return
+
+    pending_buffer = pending_buffer_changes.get(buffer_id)
+
+    if pending_buffer:
+        if buffer_version is None or buffer_version == pending_buffer["version"]:
+            notify_did_change(pending_buffer["view"])
+
+def queue_did_change(view: sublime.View):
+    debug('sending change')
+    buffer_id = view.buffer_id()
+    buffer_version = 1
+    pending_buffer = None
+    if buffer_id in pending_buffer_changes:
+        pending_buffer = pending_buffer_changes[buffer_id]
+        buffer_version = pending_buffer["version"] + 1
+        pending_buffer["version"] = buffer_version
+    else:
+        pending_buffer_changes[buffer_id] = {
+            "view": view,
+            "version": buffer_version
+        }
+        
+    sublime.set_timeout_async(
+        lambda: purge_did_change(buffer_id, buffer_version), 500)
+
+
+def notify_did_change(view: sublime.View):
+    if view.buffer_id() in pending_buffer_changes:
+        del pending_buffer_changes[view.buffer_id()]
+    if client:
+        document_state = get_document_state(view.file_name())
+        uri = filename_to_uri(view.file_name())
+        params = {
+            "textDocument": {
+                "uri": uri,
+                # "languageId": config.languageId, clangd does not like this field, but no server uses it?
+                "version": document_state.inc_version(),
+            },
+            "contentChanges": [{
+                "text": view.substr(sublime.Region(0, view.size()))
+            }]
+        }
+        debug('sending change notification: ', params)
+        client.send_notification(Notification.didChange(params))
+
+
+
+document_sync_initialized = False
 def initialize_document_sync(text_document_sync_kind):
     global document_sync_initialized
     if document_sync_initialized:
@@ -287,7 +426,7 @@ def initialize_document_sync(text_document_sync_kind):
     # TODO: hook up events per scope/client
     Events.subscribe('view.on_load_async', notify_did_open)
     Events.subscribe('view.on_activated_async', notify_did_open)
-    Events.subscribe('view.on_modified_async', queue_did_change)
+    EventHub.subscribe('on_modified_async', queue_did_change)
     Events.subscribe('view.on_post_save_async', notify_did_save)
     Events.subscribe('view.on_close', notify_did_close)
 
@@ -318,18 +457,18 @@ def handle_initialize_result(result, client):
     capabilities = result.get("capabilities")
     client.set_capabilities(capabilities)
     document_sync = capabilities.get("textDocumentSync")
-    util.debug('document_sync', document_sync)
+    debug('document_sync', document_sync)
     initialize_document_sync(document_sync)
 
     # for view in didopen_after_initialize:
     # notify_did_open(view)
-    util.debug('init complete')
+    debug('init complete')
     #didopen_after_initialize = list()
 
 
 def deleteDbIfExists():
     try:
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         if len(dx_folder) > 0:
             db_path = os.path.join(dx_folder, '.sfdx', 'tools', 'apex.db')
             if os.path.isfile(db_path):
@@ -341,10 +480,11 @@ def deleteDbIfExists():
 
 def start_server():
     deleteDbIfExists()
-    working_dir = os.path.join(util.get_plugin_folder(), 'apex-jorje-lsp.jar')
-    args = ['java', '-cp', working_dir, '-Dtrace.protocol=false',
+    working_dir = os.path.join(get_plugin_folder(), 'apex-jorje-lsp.jar')
+    debug('dx project folder: ', dxProjectFolder())
+    args = ['java', '-cp', working_dir, '-Ddebug.internal.errors=true','-Ddebug.semantic.errors=false',
             'apex.jorje.lsp.ApexLanguageServerLauncher']
-    util.debug("starting " + str(args))
+    debug("starting " + str(args))
     si = None
     if os.name == "nt":
         si = subprocess.STARTUPINFO()  # type: ignore
@@ -355,23 +495,25 @@ def start_server():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=util.dxProjectFolder(),
+            cwd=dxProjectFolder(),
             startupinfo=si)
         return Client(process)
 
     except Exception as err:
-        util.debug(err)
+        debug(err)
 
 
 def start_client():
+    global client
     client = start_server()
     if not client:
         print("Could not start language server")
         return
-
+    root_uri = filename_to_uri(dxProjectFolder())
+    debug('project uri: ', root_uri)
     initializeParams = {
         "processId": client.process.pid,
-        "rootUri": filename_to_uri(util.dxProjectFolder()),
+        "rootPath": dxProjectFolder(),
         "capabilities": {
             "textDocument": {
                 "completion": {

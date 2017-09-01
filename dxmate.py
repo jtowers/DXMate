@@ -8,11 +8,12 @@ import json
 import mdpopups
 import time
 from collections import OrderedDict
-from dxmate.lib.printer import PanelPrinter
-from dxmate.lib.threads import ThreadProgress
-from dxmate.lib.threads import PanelThreadProgress
-import dxmate.lib.languageServer as languageServer
-import dxmate.lib.util as util
+from .lib.printer import PanelPrinter
+from .lib.threads import ThreadProgress
+from .lib.threads import PanelThreadProgress
+from .lib.languageServer import *
+from .lib.event_hub import EventHub
+from .lib.util import *
 import ntpath
 
 
@@ -115,16 +116,16 @@ printer = None
 
 
 def handle_response(response):
-    util.debug('response', response)
+    debug('response', response)
 
 
 def plugin_loaded():
     global lsClient
     global printer
-    if util.dxProjectFolder() != '':
-        lsClient = languageServer.start_client()
+    if dxProjectFolder() != '':
+        lsClient = start_client()
         if lsClient is None:
-            util.debug('Can\'t start client')
+            debug('Can\'t start client')
 
     active_window_id = sublime.active_window().id()
     printer = PanelPrinter.get(active_window_id)
@@ -132,8 +133,7 @@ def plugin_loaded():
 
 
 def plugin_unloaded():
-    if not lsClient is None:
-        lsClient.kill()
+    handle_close()
 
 
 class ExitHandler(sublime_plugin.EventListener):
@@ -143,14 +143,24 @@ class ExitHandler(sublime_plugin.EventListener):
             plugin_unloaded()
 
 
-class CompletionHandler(sublime_plugin.EventListener):
+class EventHandlers(sublime_plugin.EventListener):
 
     def __init__(self):
         self.completions = []  # type: List[Tuple[str, str]]
         self.refreshing = False
 
+    def on_pre_close(self, view):
+        EventHub.publish('on_pre_close')
+
+    def on_modified_async(self, view):
+        active_file_extension = file_extension(view)
+        if active_file_extension != '.cls' and active_file_extension != '.trigger':
+            return None
+        debug('modified document')
+        EventHub.publish("on_modified_async", view)
+
     def on_query_completions(self, view, prefix, locations):
-        active_file_extension = util.active_file_extension()
+        active_file_extension = file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
             return None
 
@@ -167,13 +177,12 @@ class CompletionHandler(sublime_plugin.EventListener):
             autocomplete_triggers = completionProvider.get('triggerCharacters')
             if locations[0] > 0:
                 self.completions = []
-            print('at char - continue')
-            util.purge_did_change(view.buffer_id())
+            purge_did_change(view.buffer_id())
             client.send_request(
-                languageServer.Request.complete(
-                    util.get_document_position(view, locations[0])),
+                Request.complete(
+                    get_document_position(view, locations[0])),
                 self.handle_response)
-            util.debug('sending completion request')
+            debug('sending completion request')
         self.refreshing = False
         return self.completions, (sublime.INHIBIT_WORD_COMPLETIONS
                                   | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
@@ -195,15 +204,15 @@ class CompletionHandler(sublime_plugin.EventListener):
         self.completions = []
         items = response["items"] if isinstance(response,
                                                 dict) else response
-        util.debug('items', items)
+        debug('items', items)
         for item in items:
             self.completions.append(self.format_completion(item))
-        util.debug('completions: ', self.completions)
+        debug('completions: ', self.completions)
         sublime.active_window().active_view().run_command('hide_auto_complete')
         self.run_auto_complete()
 
     def run_auto_complete(self):
-        util.debug('running autocomplete')
+        debug('running autocomplete')
         self.refreshing = True
         sublime.active_window().active_view().run_command(
             "auto_complete", {
@@ -217,8 +226,8 @@ class CompletionHandler(sublime_plugin.EventListener):
 class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        self.dx_folder = util.dxProjectFolder()
-        self.active_file = util.active_file()
+        self.dx_folder = dxProjectFolder()
+        self.active_file = active_file()
         self.active_file = ntpath.split(self.active_file)[
             1].replace('.cls', '')
         self.class_name = 'ApexClassName'
@@ -233,10 +242,10 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
         PanelThreadProgress(t, 'Running Tests')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if(self.dx_folder == ''):
             return False
-        self.active_file = util.active_file()
+        self.active_file = active_file()
         if not self.active_file.endswith('.cls'):
             return False
         return True
@@ -268,7 +277,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
 
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         sublime.active_window().show_input_panel(
             'Org (leave blank for default)', '', self.run_tests, None, None)
 
@@ -285,7 +294,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Running Org Tests')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -318,7 +327,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
 class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         printer.show()
         printer.write('\nPushing Source')
         t = threading.Thread(target=self.run_command)
@@ -330,7 +339,7 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Source Pushed')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -363,7 +372,7 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         printer.show()
         t = threading.Thread(target=self.run_command)
         t.start()
@@ -375,7 +384,7 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Source Pulled')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -408,7 +417,7 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         printer.show()
         t = threading.Thread(target=self.run_command)
         t.start()
@@ -420,7 +429,7 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Org Opened')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -449,7 +458,7 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         self.def_file = os.path.join(
             self.dx_folder, 'config', 'project-scratch-def.json')
         sublime.active_window().show_input_panel(
@@ -468,7 +477,7 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Scratch Org Created')
 
     def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
+        self.dx_folder = dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -509,13 +518,13 @@ class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Auth Page Opened')
 
     def is_enabled(self):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         if dx_folder == '':
             return False
         return True
 
     def run_command(self):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         args = ['sfdx', 'force:auth:web:login', '-d', '-s', '-a', 'DevHub']
         startupinfo = None
         if os.name == 'nt':
@@ -550,7 +559,7 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
             'Class Name', self.class_name, self.create_class, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         print(dx_folder)
         if(dx_folder == ''):
             return False
@@ -571,7 +580,7 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
         PanelThreadProgress(t, 'Apex Class Created')
 
     def run_command(self):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         args = ['sfdx', 'force:apex:class:create',
                 '-n', self.class_name, '-d', self.class_dir]
         startupinfo = None
@@ -609,13 +618,13 @@ class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Project Upgraded')
 
     def is_enabled(self):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         if dx_folder == '':
             return False
         return True
 
     def run_command(self):
-        dx_folder = util.dxProjectFolder()
+        dx_folder = dxProjectFolder()
         args = ['sfdx', 'force:project:upgrade', '-f']
         startupinfo = None
         if os.name == 'nt':
