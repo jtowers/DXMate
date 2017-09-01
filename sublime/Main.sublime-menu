@@ -69,7 +69,24 @@
 						"command": "dxmate_pull_source"
 					}
 	    		]
-	    	}
+	    	},
+	    	{
+	        	"id": "settings",
+	    		"caption": "Settings",
+	         	"children":
+	         	[
+					{
+						"command": "open_file",
+						"args": {"file": "${packages}/User/dxmate.sublime-settings"},
+						"caption": "User Plugin Settings"
+					},
+					{
+						"command": "open_file",
+						"args": {"file": "${packages}/dxmate/dxmate.sublime-settings"},
+						"caption": "Default Plugin Settings"
+					}
+	         	]
+	     	},
 	    	
 	    ]
     
