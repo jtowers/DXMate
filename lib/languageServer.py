@@ -212,6 +212,8 @@ def start_server():
     debug(java_path)
     if java_path != '':
         java_cmd = os.path.join(java_path, java_cmd)
+
+    debug('using java path: ', java_cmd)
     args = [java_cmd, '-cp', working_dir, '-Ddebug.internal.errors=true','-Ddebug.semantic.errors=false',
             'apex.jorje.lsp.ApexLanguageServerLauncher']
     debug("starting " + str(args))
