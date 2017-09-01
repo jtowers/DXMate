@@ -161,6 +161,22 @@ class EventHandlers(sublime_plugin.EventListener):
         EventHub.publish('on_post_save_async', view)
     def on_close(self, view):
         EventHub.publish('on_close', view)
+    def on_window_command(self, window, command_name, *args):
+        debug(command_name)
+        if command_name == 'exit':
+            EventHub.publish('exit', window, *args)
+        elif command_name == 'close_window':
+            EventHub.publish('close_window', window, *args)
+        else:
+            EventHub.publish('on_window_command', window, command_name, *args)
+    def on_text_command(self, window, command_name, *args):
+        debug(command_name)
+        if command_name == 'exit':
+            EventHub.publish('exit', window, *args)
+        elif command_name == 'close_window':
+            EventHub.publish('close_window', window, *args)
+        else:
+            EventHub.publish('on_window_command', window, command_name, *args)
     def on_modified_async(self, view):
         active_file_extension = file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
@@ -251,6 +267,8 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
             return False
         self.active_file = active_file()
         if not self.active_file.endswith('.cls'):
+            return False
+        if not file_is_test(self.window.active_view()):
             return False
         return True
 

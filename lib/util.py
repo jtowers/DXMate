@@ -9,7 +9,7 @@ from collections import OrderedDict
 from .languageServer import *
 from .event_hub import EventHub
 import json
-
+import re
 settings = None
 
 def load_settings():
@@ -37,6 +37,10 @@ def dxProjectFolder():
                         return folder
     return ''
 
+def file_is_test(view):
+    contents = view.substr(sublime.Region(0, view.size()))
+    debug(contents)
+    return '@istest' in contents.lower() or 'testmethod' in contents.lower()
 
 def run_events():
     if dxProjectFolder() != '':
@@ -99,10 +103,17 @@ def debug(*args):
         print(plugin_name(), ': ', *args)
 
 
-def handle_close():
-    if dxProjectFolder() == '':
+
+def handle_close(window, *args):
+    if dxProjectFolder() == '' and client:
         client.kill()
 
+def handle_exit(window, *args):
+    if client:
+        client.kill()
+
+EventHub.subscribe('exit', handle_exit)
+EventHub.subscribe('close_window', handle_close)
 
 def format_request(payload: 'Dict[str, Any]'):
     """Converts the request into json and adds the Content-Length header"""
