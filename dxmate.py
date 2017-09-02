@@ -14,6 +14,7 @@ from .lib.threads import PanelThreadProgress
 from .lib.languageServer import *
 from .lib.event_hub import EventHub
 from .lib.util import *
+from .lib.diagnostic import *
 import ntpath
 
 
@@ -148,7 +149,7 @@ class EventHandlers(sublime_plugin.EventListener):
         self.refreshing = False
 
     def on_pre_close(self, view):
-        EventHub.publish('on_pre_close')
+        EventHub.publish('on_pre_close', view)
 
 
     def on_close(self, view):
@@ -161,6 +162,22 @@ class EventHandlers(sublime_plugin.EventListener):
         EventHub.publish('on_post_save_async', view)
     def on_close(self, view):
         EventHub.publish('on_close', view)
+    def on_hover(self, view, point, hover_zone):
+        EventHub.publish('on_hover', view, point, hover_zone)
+    def on_window_command(self, window, command_name, *args):
+        if command_name == 'exit':
+            EventHub.publish('exit', window, *args)
+        elif command_name == 'close_window':
+            EventHub.publish('close_window', window, *args)
+        else:
+            EventHub.publish('on_window_command', window, command_name, *args)
+    def on_text_command(self, window, command_name, *args):
+        if command_name == 'exit':
+            EventHub.publish('exit', window, *args)
+        elif command_name == 'close_window':
+            EventHub.publish('close_window', window, *args)
+        else:
+            EventHub.publish('on_window_command', window, command_name, *args)
     def on_modified_async(self, view):
         active_file_extension = file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
@@ -251,6 +268,8 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
             return False
         self.active_file = active_file()
         if not self.active_file.endswith('.cls'):
+            return False
+        if not file_is_test(self.window.active_view()):
             return False
         return True
 
