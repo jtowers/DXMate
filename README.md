@@ -13,10 +13,11 @@ Supports most useful CLI commands including:
 * Push\Pull source
 * Create Apex classes
 * Run tests for an org or specific class
-
+* Code completion
+* Diagnostics
 Uses syntax highlighting from MavensMate
 
-Supports code completion with the [Apex Language Server](https://developer.salesforce.com/docs/atlas.en-us.sfdx_ide2.meta/sfdx_ide2/sfdx_ide2_build_app_apex_language_server_protocol.htm)
+Language services (e.g., code completion and diagnostics) are provided by the [Apex Language Server](https://developer.salesforce.com/docs/atlas.en-us.sfdx_ide2.meta/sfdx_ide2/sfdx_ide2_build_app_apex_language_server_protocol.htm)
 
 ## Settings
 
