@@ -63,6 +63,13 @@ def file_extension(view):
         return file_extension
 
 
+def is_apex_file(view):
+    ext = file_extension(view)
+    if ext and (ext == '.cls' or ext == '.trigger'):
+        return True
+    return False
+
+
 def get_plugin_folder():
     packages_path = os.path.join(sublime.packages_path(), plugin_name())
     debug(packages_path)

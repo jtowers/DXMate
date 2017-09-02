@@ -36,7 +36,6 @@ from urllib.request import pathname2url
 from urllib.request import url2pathname
 from .request import Request
 from .notification import Notification
-
 client = None
 
 
@@ -161,6 +160,7 @@ didopen_after_initialize = False
 def handle_initialize_result(result, client, window, config):
     global didopen_after_initialize
     capabilities = result.get("capabilities")
+    debug(capabilities)
     client.set_capabilities(capabilities)
 
     # TODO: These handlers is already filtered by syntax but does not need to
@@ -170,8 +170,7 @@ def handle_initialize_result(result, client, window, config):
     if document_sync:
         initialize_document_sync(document_sync)
 
-    EventHub.subscribe('document.diagnostics', handle_diagnostics)
-    EventHub.subscribe('on_close', remove_diagnostics)
+    
     for view in didopen_after_initialize:
         notify_did_open(view)
     if show_status_messages:
@@ -234,6 +233,9 @@ def start_server():
     except Exception as err:
         debug(err)
 
+def get_client():
+    global client
+    return client
 
 def start_client():
     global client
@@ -250,6 +252,9 @@ def start_client():
                     "completionItem": {
                         "snippetSupport": True
                     }
+                },
+                "hover":{
+                    "dynamicRegistration": True
                 }
             }
         }
