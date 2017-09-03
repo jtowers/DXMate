@@ -590,7 +590,7 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
     def run_command(self):
         dx_folder = dxProjectFolder()
         args = ['sfdx', 'force:data:soql:query',
-                '-q', self.query, '--json']
+                '-q', self.query]
         startupinfo = None
         if os.name == 'nt':
             startupinfo = subprocess.STARTUPINFO()
@@ -619,7 +619,7 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
                 syntax_path = os.path.join("Packages",plugin_name(),"sublime","lang","JSON.tmLanguage")
             else:
                 syntax_path = os.path.join("Packages/"+plugin_name()+"/sublime/lang/JSON.tmLanguage")
-            file.set_syntax_file(syntax_path)
+            #file.set_syntax_file(syntax_path)
             file.run_command("insert", {"characters":content})
         else:
             printer.write('\nError running query:')
