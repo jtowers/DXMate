@@ -604,22 +604,22 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
         r = p.returncode
         if p.returncode == 0:
             printer.write('\nOpening results file')
-            #file_name = time.strftime("%d_%b_%Y_%H-%M-%S", time.localtime()) + '.json'
-            #file_path = os.path.join(dxProjectFolder(), '.sfdx','query',file_name)
-            #file = sublime.active_window().open_file(file_path)
             content = str(out,'UTF-8')
-            try:
-                parsed = json.loads(content)
-                #content = json.dumps(parsed,  sort_keys=True,indent=1, separators=(',', ':'))
-                debug(content)
-            except Exception as e:
-                debug('could not format query results\n', e)
+            #try:
+            #    parsed = json.loads(content)
+            #    content = json.dumps(parsed,  sort_keys=True,indent=1, separators=(',', ':'))
+            #    debug(content)
+            #except Exception as e:
+            #    debug('could not format query results\n', e)
             file = sublime.active_window().new_file()
             file.set_scratch(True)
             file.set_name('SOQL')
-            syntax_file = os.path.join(get_syntax_folder(),'JSON.tmLanguage')
-            file.set_syntax_file(syntax_file)
-            #sublime.active_window().open_file(file_path)
+            syntax_path = None
+            if "linux" in sys.platform or "darwin" in sys.platform:
+                syntax_path = os.path.join("Packages",plugin_name(),"sublime","lang","JSON.tmLanguage")
+            else:
+                syntax_path = os.path.join("Packages/"+plugin_name()+"/sublime/lang/JSON.tmLanguage")
+            file.set_syntax_file(syntax_path)
             file.run_command("insert", {"characters":content})
         else:
             printer.write('\nError running query:')
