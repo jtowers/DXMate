@@ -60,7 +60,7 @@ def get_document_state(path: str) -> DocumentState:
     return document_states[path]
 
 def notify_did_open(view: sublime.View):
-    if client and view and view.file_name():
+    if client and view and view.file_name() and is_apex_file(view):
         view.settings().set("show_definitions", False)
         if view.file_name() not in document_states:
             get_document_state(view.file_name())
@@ -75,7 +75,7 @@ def notify_did_open(view: sublime.View):
 
 
 def notify_did_close(view: sublime.View):
-    if view.file_name() in document_states:
+    if is_apex_file(view) and view.file_name() in document_states:
         del document_states[view.file_name()]
         if client:
             params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
@@ -83,7 +83,7 @@ def notify_did_close(view: sublime.View):
 
 
 def notify_did_save(view: sublime.View):
-    if view.file_name() in document_states:
+    if is_apex_file(view) and view.file_name() in document_states:
         if client:
             params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
             client.send_notification(Notification.didSave(params))
@@ -122,7 +122,7 @@ def queue_did_change(view: sublime.View):
 
 
 def notify_did_change(view: sublime.View):
-    if view.buffer_id() in pending_buffer_changes:
+    if is_apex_file(view) and view.buffer_id() in pending_buffer_changes:
         del pending_buffer_changes[view.buffer_id()]
     if client:
         document_state = get_document_state(view.file_name())
