@@ -79,7 +79,6 @@ def get_plugin_folder():
 def get_syntax_folder():
     plugin_folder = get_plugin_folder()
     syntax_folder = os.path.join(plugin_folder, "sublime", "lang")
-    debug(syntax_folder)
     return syntax_folder
 
 
@@ -112,10 +111,12 @@ def debug(*args):
 
 
 def handle_close(window, *args):
+    client = get_client()
     if dxProjectFolder() == '' and client:
         client.kill()
 
 def handle_exit(window, *args):
+    client = get_client()
     if client:
         client.kill()
 
