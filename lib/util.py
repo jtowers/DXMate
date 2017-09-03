@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from urllib.request import pathname2url
 from urllib.request import url2pathname
 from collections import OrderedDict
-from .languageServer import get_client
+from .languageServer import *
 from .event_hub import EventHub
 import json
 import re
