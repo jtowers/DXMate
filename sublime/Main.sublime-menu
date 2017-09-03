@@ -5,6 +5,16 @@
     "children":
 	    [
 	    	{
+	    		"caption": "Data",
+	    		"children" :
+	    		[
+	    			{
+			    		"caption": "SOQL Query",
+			    		"command" : "dxmate_run_soql"
+	    			}
+	    		]
+	    	},
+	    	{
 	    		"caption": "Project",
 	    		"children" :
 	    		[

@@ -563,8 +563,70 @@ class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
             printer.write('\n' + str(err, 'utf-8'))
 
 
-class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
+class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
 
+    def run(self):
+        sublime.active_window().show_input_panel(
+            'Query', '', self.run_query, None, None)
+
+    def is_enabled(self, paths=[]):
+        dx_folder = dxProjectFolder()
+        if(dx_folder == ''):
+            return False
+        return True
+
+    def run_query(self, input):
+        self.query = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Running query', 'Query run')
+        printer.write('\nRunning query')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Query run')
+
+    def run_command(self):
+        dx_folder = dxProjectFolder()
+        args = ['sfdx', 'force:data:soql:query',
+                '-q', self.query, '--json']
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nOpening results file')
+            content = str(out,'UTF-8')
+            #try:
+            #    parsed = json.loads(content)
+            #    content = json.dumps(parsed,  sort_keys=True,indent=1, separators=(',', ':'))
+            #    debug(content)
+            #except Exception as e:
+            #    debug('could not format query results\n', e)
+            file = sublime.active_window().new_file()
+            file.set_scratch(True)
+            file.set_name('SOQL')
+            syntax_path = None
+            if "linux" in sys.platform or "darwin" in sys.platform:
+                syntax_path = os.path.join("Packages",plugin_name(),"sublime","lang","JSON.tmLanguage")
+            else:
+                syntax_path = os.path.join("Packages/"+plugin_name()+"/sublime/lang/JSON.tmLanguage")
+            file.set_syntax_file(syntax_path)
+            file.run_command("insert", {"characters":content})
+        else:
+            printer.write('\nError running query:')
+            printer.write('\n' + str(err, 'utf-8'))
+
+
+class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
     def run(self, paths=[]):
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             printer.show()
