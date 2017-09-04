@@ -12,6 +12,9 @@ import json
 import re
 settings = None
 
+global sublime_version
+sublime_version = int(float(sublime.version()))
+
 def load_settings():
     return sublime.load_settings('dxmate.sublime-settings')
 

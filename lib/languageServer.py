@@ -24,7 +24,6 @@ import sublime
 import sublime_plugin
 import os
 import subprocess
-from .util import *
 from .event_hub import EventHub
 from .client import Client
 import threading
@@ -36,6 +35,7 @@ from urllib.request import pathname2url
 from urllib.request import url2pathname
 from .request import Request
 from .notification import Notification
+from .util import *
 client = None
 
 

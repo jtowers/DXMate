@@ -3,9 +3,8 @@ import os
 import unicodedata
 import time
 import json
-import MavensMate.config as config
 from .threads import ThreadTracker
-
+from .util import *
 def write_to_active_printer(message, show=True):
     active_window_id = sublime.active_window().id()
     p = PanelPrinter.get(active_window_id)
@@ -132,7 +131,7 @@ class PanelPrinter(object):
         sublime.set_timeout(lambda : self.panel.show(size, True), 2)
 
     def write_callback(self):
-        if config.sublime_version >= 3000:
+        if sublime_version >= 3000:
             found = False
             for key in self.strings.keys():
                 if len(self.strings[key]):
