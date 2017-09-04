@@ -3,7 +3,8 @@ Sublime Text 3 plugin to provide integration with the Salesforce DX CLI
 
 ## Instructions
 1. Install the [DX CLI](https://developer.salesforce.com/tools/sfdxcli)
-2. Run `Package Control: Install Package` from the command palette in Sublime and search for 'dxmate' or clone this package into your Packages directory
+2. Run `Package Control: Install Package` from the command palette in Sublime and search for 'dxmate'
+3. In the command pallette run `Package Control: Satisfy Dependencies`
 
 ## Features
 Supports most useful CLI commands including:
