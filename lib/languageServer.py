@@ -263,3 +263,17 @@ def start_client():
         Request.initialize(initializeParams),
         lambda result: handle_initialize_result(result, client))
     return client
+
+
+
+def handle_close(window, *args):
+    if dxProjectFolder() == '' and client:
+        client.kill()
+
+def handle_exit(window, *args):
+    if client:
+        client.kill()
+
+EventHub.subscribe('exit', handle_exit)
+EventHub.subscribe('close_window', handle_close)
+EventHub.subscribe('on_pre_close', handle_close)

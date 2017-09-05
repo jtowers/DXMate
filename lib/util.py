@@ -6,10 +6,7 @@ from urllib.parse import urlparse
 from urllib.request import pathname2url
 from urllib.request import url2pathname
 from collections import OrderedDict
-from .languageServer import *
-from .event_hub import EventHub
 import json
-import re
 settings = None
 
 global sublime_version
@@ -112,20 +109,6 @@ def debug(*args):
         print(plugin_name(), ': ', *args)
 
 
-
-def handle_close(window, *args):
-    client = get_client()
-    if dxProjectFolder() == '' and client:
-        client.kill()
-
-def handle_exit(window, *args):
-    client = get_client()
-    if client:
-        client.kill()
-
-EventHub.subscribe('exit', handle_exit)
-EventHub.subscribe('close_window', handle_close)
-
 def format_request(payload: 'Dict[str, Any]'):
     """Converts the request into json and adds the Content-Length header"""
     content = json.dumps(payload, sort_keys=False)
@@ -140,6 +123,6 @@ def filename_to_uri(path: str) -> str:
 def uri_to_filename(uri: str) -> str:
     return url2pathname(urlparse(uri).path)
 
-EventHub.subscribe('on_pre_close', handle_close)
+
 
 
