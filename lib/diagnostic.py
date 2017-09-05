@@ -194,7 +194,7 @@ def update_file_diagnostics(window: sublime.Window, file_path: str, source: str,
 
 def handle_diagnostics(update: 'Any'):
     util.debug('handling diagnostics')
-    file_path = uri_to_filename(update.get('uri'))
+    file_path = util.uri_to_filename(update.get('uri'))
     window = sublime.active_window()
 
     if not util.is_apex_file(window.active_view()):
