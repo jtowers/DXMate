@@ -124,7 +124,7 @@ def plugin_loaded():
         lsClient = start_client()
         if lsClient is None:
             util.debug('Unable start langauge server')
-
+        EventHub.subscribe('on_load_async', set_syntax)
     active_window_id = sublime.active_window().id()
     printer = PanelPrinter.get(active_window_id)
     printer.write("sfdx plugin loaded", erase=True)
@@ -134,6 +134,14 @@ def plugin_unloaded():
     if lsClient:
         lsClient.kill()
 
+
+def set_syntax(view):
+    if util.is_apex_file(view):
+        util.debug('setting syntax for file')
+        if "linux" in sys.platform or "darwin" in sys.platform:
+            view.set_syntax_file(os.path.join("Packages",util.plugin_name(),"sublime","lang","Apex.sublime-syntax"))
+        else:
+            view.set_syntax_file(os.path.join("Packages/"+util.plugin_name()+"/sublime/lang/Apex.sublime-syntax"))
 
 class ExitHandler(sublime_plugin.EventListener):
 
@@ -782,3 +790,5 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
         else:
             printer.write('\nError creating project:')
             printer.write('\n' + t)
+
+
