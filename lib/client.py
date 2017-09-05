@@ -23,6 +23,7 @@
 from .request import *
 from .notification import *
 from .util import util
+from .event_hub import EventHub
 import sublime
 import threading
 class Client(object):
