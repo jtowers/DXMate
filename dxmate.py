@@ -13,7 +13,7 @@ from .lib.threads import ThreadProgress
 from .lib.threads import PanelThreadProgress
 from .lib.languageServer import *
 from .lib.event_hub import EventHub
-from .lib.util import *
+from .lib.util import util
 from .lib.diagnostic import *
 import ntpath
 
@@ -120,10 +120,10 @@ printer = None
 def plugin_loaded():
     global lsClient
     global printer
-    if dxProjectFolder() != '':
+    if util.dxProjectFolder() != '':
         lsClient = start_client()
         if lsClient is None:
-            debug('Unable start langauge server')
+            util.debug('Unable start langauge server')
 
     active_window_id = sublime.active_window().id()
     printer = PanelPrinter.get(active_window_id)
@@ -179,13 +179,13 @@ class EventHandlers(sublime_plugin.EventListener):
         else:
             EventHub.publish('on_window_command', window, command_name, *args)
     def on_modified_async(self, view):
-        active_file_extension = file_extension(view)
+        active_file_extension = util.file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
             return None
         EventHub.publish("on_modified_async", view)
 
     def on_query_completions(self, view, prefix, locations):
-        active_file_extension = file_extension(view)
+        active_file_extension = util.file_extension(view)
         if active_file_extension != '.cls' and active_file_extension != '.trigger':
             return None
 
@@ -247,7 +247,7 @@ class EventHandlers(sublime_plugin.EventListener):
 class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
 
     def run(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         self.active_file = active_file()
         self.active_file = ntpath.split(self.active_file)[
             1].replace('.cls', '')
@@ -263,7 +263,7 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
         PanelThreadProgress(t, 'Running Tests')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if(self.dx_folder == ''):
             return False
         self.active_file = active_file()
@@ -300,7 +300,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
 
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         sublime.active_window().show_input_panel(
             'Org (leave blank for default)', '', self.run_tests, None, None)
 
@@ -317,7 +317,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Running Org Tests')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -350,7 +350,7 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
 class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         printer.show()
         printer.write('\nPushing Source')
         t = threading.Thread(target=self.run_command)
@@ -362,7 +362,7 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Source Pushed')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -394,7 +394,7 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
 class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         printer.show()
         t = threading.Thread(target=self.run_command)
         t.start()
@@ -406,7 +406,7 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Source Pulled')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -438,7 +438,7 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
 class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         printer.show()
         t = threading.Thread(target=self.run_command)
         t.start()
@@ -450,7 +450,7 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Org Opened')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -478,7 +478,7 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
 class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         self.def_file = os.path.join(
             self.dx_folder, 'config', 'project-scratch-def.json')
         sublime.active_window().show_input_panel(
@@ -497,7 +497,7 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Scratch Org Created')
 
     def is_enabled(self):
-        self.dx_folder = dxProjectFolder()
+        self.dx_folder = util.dxProjectFolder()
         if self.dx_folder == '':
             return False
         return True
@@ -537,13 +537,13 @@ class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Auth Page Opened')
 
     def is_enabled(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if dx_folder == '':
             return False
         return True
 
     def run_command(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         args = ['sfdx', 'force:auth:web:login', '-d', '-s', '-a', 'DevHub']
         startupinfo = None
         if os.name == 'nt':
@@ -570,7 +570,7 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
             'Query', '', self.run_query, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if(dx_folder == ''):
             return False
         return True
@@ -588,7 +588,7 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
         PanelThreadProgress(t, 'Query run')
 
     def run_command(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         args = ['sfdx', 'force:data:soql:query',
                 '-q', self.query]
         startupinfo = None
@@ -608,9 +608,9 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
             #try:
             #    parsed = json.loads(content)
             #    content = json.dumps(parsed,  sort_keys=True,indent=1, separators=(',', ':'))
-            #    debug(content)
+            #    util.debug(content)
             #except Exception as e:
-            #    debug('could not format query results\n', e)
+            #    util.debug('could not format query results\n', e)
             file = sublime.active_window().new_file()
             file.set_scratch(True)
             file.set_name('SOQL')
@@ -639,7 +639,7 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
             'Class Name', self.class_name, self.create_class, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if(dx_folder == ''):
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
@@ -659,7 +659,7 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
         PanelThreadProgress(t, 'Apex Class Created')
 
     def run_command(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         args = ['sfdx', 'force:apex:class:create',
                 '-n', self.class_name, '-d', self.class_dir]
         startupinfo = None
@@ -696,13 +696,13 @@ class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
         PanelThreadProgress(t, 'Project Upgraded')
 
     def is_enabled(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if dx_folder == '':
             return False
         return True
 
     def run_command(self):
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         args = ['sfdx', 'force:project:upgrade', '-f']
         startupinfo = None
         if os.name == 'nt':

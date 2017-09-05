@@ -22,7 +22,8 @@
 
 from collections import OrderedDict
 import sublime
-from .util import *
+from .util import util
+from .event_hub import EventHub
 import mdpopups
 show_diagnostics_phantoms = True
 UNDERLINE_FLAGS = (sublime.DRAW_NO_FILL
@@ -192,12 +193,12 @@ def update_file_diagnostics(window: sublime.Window, file_path: str, source: str,
                     del file_diagnostics[file_path]
 
 def handle_diagnostics(update: 'Any'):
-    debug('handling diagnostics')
+    util.debug('handling diagnostics')
     file_path = uri_to_filename(update.get('uri'))
     window = sublime.active_window()
 
-    if not is_apex_file(window.active_view()):
-        debug("Skipping diagnostics for file", file_path,
+    if not util.is_apex_file(window.active_view()):
+        util.debug("Skipping diagnostics for file", file_path,
               " it is not in the workspace")
         return
 
@@ -317,7 +318,7 @@ def update_diagnostics_in_view(view: sublime.View, diagnostics: 'List[Diagnostic
 def remove_diagnostics(view: sublime.View):
     """Removes diagnostics for a file if no views exist for it
     """
-    if is_apex_file(view):
+    if util.is_apex_file(view):
         window = sublime.active_window()
 
         file_path = view.file_name()
@@ -325,10 +326,10 @@ def remove_diagnostics(view: sublime.View):
             update_file_diagnostics(window, file_path, 'dxmate', [])
             update_diagnostics_panel(window)
         else:
-            debug('file still open?')
+            util.debug('file still open?')
 
 def show_diagnostics_hover(view, point, diagnostics):
-    #debug('got diagnostics: ', diagnostics)
+    #util.debug('got diagnostics: ', diagnostics)
     formatted = list("{}: {}".format(format_severity(diagnostic.severity), diagnostic.message) for diagnostic in diagnostics)
     #formatted.append("[{}]({})".format('Code Actions', 'code-actions'))
     mdpopups.show_popup(
@@ -344,10 +345,10 @@ def show_diagnostics_hover(view, point, diagnostics):
         )
 
 def handle_hover(view, point, hover_zone):
-    if is_apex_file(view):
+    if util.is_apex_file(view):
         if hover_zone != sublime.HOVER_TEXT or view.is_popup_visible():
             return
-        debug('handling hover')
+        util.debug('handling hover')
         line_diagnostics = get_line_diagnostics(view, point)
         if line_diagnostics:
             show_diagnostics_hover(view, point, line_diagnostics)
