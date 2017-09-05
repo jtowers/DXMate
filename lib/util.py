@@ -37,7 +37,6 @@ class Util(object):
 
     def file_is_test(self,view):
         contents = view.substr(sublime.Region(0, view.size()))
-        debug(contents)
         return '@istest' in contents.lower() or 'testmethod' in contents.lower()
 
     def run_events(self):

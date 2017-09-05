@@ -225,8 +225,8 @@ def create_diagnostics_panel(window):
     panel = create_output_panel(window, "diagnostics")
     panel.settings().set("result_file_regex", r"^\s*\S\s+(\S.*):$")
     panel.settings().set("result_line_regex", r"^\s+([0-9]+):?([0-9]+).*$")
-    panel.assign_syntax("Packages/" + util.plugin_name() +
-                        "/sublime/lang/Diagnostics.sublime-syntax")
+    #panel.assign_syntax("Packages/" + util.plugin_name() +
+    #                    "/sublime/lang/Diagnostics.sublime-syntax")
     return panel
 
 def ensure_diagnostics_panel(window):
