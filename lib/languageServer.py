@@ -193,7 +193,7 @@ def handle_initialize_result(result, client):
 
 def deleteDbIfExists():
     try:
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if len(dx_folder) > 0:
             db_path = os.path.join(dx_folder, '.sfdx', 'tools', 'apex.db')
             if os.path.isfile(db_path):

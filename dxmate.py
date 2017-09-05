@@ -205,7 +205,7 @@ class EventHandlers(sublime_plugin.EventListener):
             purge_did_change(view.buffer_id())
             client.send_request(
                 Request.complete(
-                    get_document_position(view, locations[0])),
+                    util.get_document_position(view, locations[0])),
                 self.handle_response)
         self.refreshing = False
         return self.completions, (sublime.INHIBIT_WORD_COMPLETIONS
@@ -269,7 +269,7 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
         self.active_file = util.active_file()
         if not self.active_file.endswith('.cls'):
             return False
-        if not file_is_test(self.window.active_view()):
+        if not util.file_is_test(self.window.active_view()):
             return False
         return True
 

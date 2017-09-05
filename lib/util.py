@@ -113,13 +113,6 @@ class Util(object):
         result = "Content-Length: {}\r\n\r\n{}".format(content_length, content)
         return result
 
-    def filename_to_uri(self,path: str) -> str:
-        return urljoin('file:', pathname2url(path))
-
-
-    def uri_to_filename(self,uri: str) -> str:
-        return url2pathname(urlparse(uri).path)
-
 
 util = Util()
 

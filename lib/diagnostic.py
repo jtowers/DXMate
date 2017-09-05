@@ -224,7 +224,7 @@ def create_diagnostics_panel(window):
     panel = create_output_panel(window, "diagnostics")
     panel.settings().set("result_file_regex", r"^\s*\S\s+(\S.*):$")
     panel.settings().set("result_line_regex", r"^\s+([0-9]+):?([0-9]+).*$")
-    panel.assign_syntax("Packages/" + plugin_name() +
+    panel.assign_syntax("Packages/" + util.plugin_name() +
                         "/sublime/lang/Diagnostics.sublime-syntax")
     return panel
 
@@ -233,7 +233,7 @@ def ensure_diagnostics_panel(window):
 
 def update_diagnostics_panel(window):
     assert window, "missing window!"
-    base_dir = dxProjectFolder()
+    base_dir = util.dxProjectFolder()
 
     panel = ensure_diagnostics_panel(window)
     assert panel, "must have a panel now!"
