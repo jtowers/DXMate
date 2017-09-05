@@ -248,7 +248,7 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         self.dx_folder = util.dxProjectFolder()
-        self.active_file = active_file()
+        self.active_file = util.active_file()
         self.active_file = ntpath.split(self.active_file)[
             1].replace('.cls', '')
         self.class_name = 'ApexClassName'
@@ -266,7 +266,7 @@ class DxmateRunFileTestsCommand(sublime_plugin.WindowCommand):
         self.dx_folder = util.dxProjectFolder()
         if(self.dx_folder == ''):
             return False
-        self.active_file = active_file()
+        self.active_file = util.active_file()
         if not self.active_file.endswith('.cls'):
             return False
         if not file_is_test(self.window.active_view()):
