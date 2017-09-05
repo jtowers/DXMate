@@ -775,10 +775,10 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
 
         p.wait()
 
-        t = p.communicate()[0]
+        out,err = p.communicate()
         r = p.returncode
         if p.returncode == 0:
             printer.write('\nProject created')
         else:
             printer.write('\nError creating project:')
-            printer.write('\n' + t)
+            printer.write('\n' + str(out, 'UTF-8'))
