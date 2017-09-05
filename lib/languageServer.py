@@ -35,7 +35,7 @@ from urllib.request import pathname2url
 from urllib.request import url2pathname
 from .request import Request
 from .notification import Notification
-from .util import *
+from .util import util
 client = None
 
 
@@ -60,13 +60,13 @@ def get_document_state(path: str) -> DocumentState:
     return document_states[path]
 
 def notify_did_open(view: sublime.View):
-    if client and view and view.file_name() and is_apex_file(view):
+    if client and view and view.file_name() and util.is_apex_file(view):
         view.settings().set("show_definitions", False)
         if view.file_name() not in document_states:
             get_document_state(view.file_name())
             params = {
                 "textDocument": {
-                    "uri": filename_to_uri(view.file_name()),
+                    "uri": util.filename_to_uri(view.file_name()),
                     "languageId": 'apex',
                     "text": view.substr(sublime.Region(0, view.size()))
                 }
@@ -75,20 +75,20 @@ def notify_did_open(view: sublime.View):
 
 
 def notify_did_close(view: sublime.View):
-    if is_apex_file(view) and view.file_name() in document_states:
+    if util.is_apex_file(view) and view.file_name() in document_states:
         del document_states[view.file_name()]
         if client:
-            params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
+            params = {"textDocument": {"uri": util.filename_to_uri(view.file_name())}}
             client.send_notification(Notification.didClose(params))
 
 
 def notify_did_save(view: sublime.View):
-    if is_apex_file(view) and view.file_name() in document_states:
+    if util.is_apex_file(view) and view.file_name() in document_states:
         if client:
-            params = {"textDocument": {"uri": filename_to_uri(view.file_name())}}
+            params = {"textDocument": {"uri": util.filename_to_uri(view.file_name())}}
             client.send_notification(Notification.didSave(params))
     else:
-        debug('document not tracked', view.file_name())
+        util.debug('document not tracked', view.file_name())
 
 pending_buffer_changes = dict()  # type: Dict[int, Dict]
 
@@ -122,11 +122,11 @@ def queue_did_change(view: sublime.View):
 
 
 def notify_did_change(view: sublime.View):
-    if is_apex_file(view) and view.buffer_id() in pending_buffer_changes:
+    if util.is_apex_file(view) and view.buffer_id() in pending_buffer_changes:
         del pending_buffer_changes[view.buffer_id()]
     if client:
         document_state = get_document_state(view.file_name())
-        uri = filename_to_uri(view.file_name())
+        uri = util.filename_to_uri(view.file_name())
         params = {
             "textDocument": {
                 "uri": uri,
@@ -160,7 +160,7 @@ didopen_after_initialize = False
 def handle_initialize_result(result, client, window, config):
     global didopen_after_initialize
     capabilities = result.get("capabilities")
-    debug(capabilities)
+    util.debug(capabilities)
     client.set_capabilities(capabilities)
 
     # TODO: These handlers is already filtered by syntax but does not need to
@@ -187,35 +187,35 @@ def handle_initialize_result(result, client):
 
     for view in didopen_after_initialize:
         notify_did_open(view)
-    debug('init complete')
+    util.debug('init complete')
     didopen_after_initialize = list()
 
 
 def deleteDbIfExists():
     try:
-        dx_folder = dxProjectFolder()
+        dx_folder = util.dxProjectFolder()
         if len(dx_folder) > 0:
             db_path = os.path.join(dx_folder, '.sfdx', 'tools', 'apex.db')
             if os.path.isfile(db_path):
                 os.remove(db_path)
-                debug('db deleted')
+                util.debug('db deleted')
     except Exception as e:
-        debug("db not deleted")
+        util.debug("db not deleted")
 
 
 def start_server():
     deleteDbIfExists()
-    working_dir = os.path.join(get_plugin_folder(), 'apex-jorje-lsp.jar')
+    working_dir = os.path.join(util.get_plugin_folder(), 'apex-jorje-lsp.jar')
     java_cmd = 'java'
-    java_path = get_setting('java_path')
-    debug(java_path)
+    java_path = util.get_setting('java_path')
+    util.debug(java_path)
     if java_path != '':
         java_cmd = os.path.join(java_path, java_cmd)
 
-    debug('using java path: ', java_cmd)
+    util.debug('using java path: ', java_cmd)
     args = [java_cmd, '-cp', working_dir, '-Ddebug.internal.errors=true','-Ddebug.semantic.errors=false',
             'apex.jorje.lsp.ApexLanguageServerLauncher']
-    debug("starting " + str(args))
+    util.debug("starting " + str(args))
     si = None
     if os.name == "nt":
         si = subprocess.STARTUPINFO()  # type: ignore
@@ -226,12 +226,12 @@ def start_server():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=dxProjectFolder(),
+            cwd=util.dxProjectFolder(),
             startupinfo=si)
         return Client(process)
 
     except Exception as err:
-        debug(err)
+        util.debug(err)
 
 def get_client():
     global client
@@ -241,11 +241,11 @@ def start_client():
     global client
     client = start_server()
     if not client:
-        debug("Could not start language server")
+        util.debug("Could not start language server")
         return
     initializeParams = {
         "processId": client.process.pid,
-        "rootPath": dxProjectFolder(),
+        "rootPath": util.dxProjectFolder(),
         "capabilities": {
             "textDocument": {
                 "completion": {
@@ -263,3 +263,17 @@ def start_client():
         Request.initialize(initializeParams),
         lambda result: handle_initialize_result(result, client))
     return client
+
+
+
+def handle_close(window, *args):
+    if util.dxProjectFolder() == '' and client:
+        client.kill()
+
+def handle_exit(window, *args):
+    if client:
+        client.kill()
+
+EventHub.subscribe('exit', handle_exit)
+EventHub.subscribe('close_window', handle_close)
+EventHub.subscribe('on_pre_close', handle_close)

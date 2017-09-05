@@ -22,6 +22,8 @@
 
 from .request import *
 from .notification import *
+from .util import util
+from .event_hub import EventHub
 import sublime
 import threading
 class Client(object):
@@ -52,7 +54,7 @@ class Client(object):
         self.send_payload(request.to_payload(self.request_id))
 
     def send_notification(self, notification: Notification):
-        debug('notify: ' + notification.method)
+        util.debug('notify: ' + notification.method)
         self.send_payload(notification.to_payload())
 
     def kill(self):
@@ -60,11 +62,11 @@ class Client(object):
 
     def send_payload(self, payload):
         try:
-            message = format_request(payload)
+            message = util.format_request(payload)
             self.process.stdin.write(bytes(message, 'UTF-8'))
             self.process.stdin.flush()
         except BrokenPipeError as e:
-            debug("client unexpectedly died:", e)
+            util.debug("client unexpectedly died:", e)
 
     def read_stdout(self):
         """
@@ -94,15 +96,15 @@ class Client(object):
                         payload = json.loads(content)
                         limit = min(len(content), 200)
                         if payload.get("method") != "window/logMessage":
-                            debug("got json: ", content[0:limit])
+                            util.debug("got json: ", content[0:limit])
                     except IOError:
-                        debug("Got a non-JSON payload: ", content)
+                        util.debug("Got a non-JSON payload: ", content)
                         continue
 
                     try:
                         if "error" in payload:
                             error = payload['error']
-                            debug("got error: ", error)
+                            util.debug("got error: ", error)
                             sublime.status_message(error.get('message'))
                         elif "method" in payload:
                             if "id" in payload:
@@ -112,9 +114,9 @@ class Client(object):
                         elif "id" in payload:
                             self.response_handler(payload)
                         else:
-                            debug("Unknown payload type: ", payload)
+                            util.debug("Unknown payload type: ", payload)
                     except Exception as err:
-                        debug("Error handling server content:", err)
+                        util.debug("Error handling server content:", err)
 
             except IOError:
                 printf("LSP stdout process ending due to exception: ",
@@ -123,7 +125,7 @@ class Client(object):
                 self.process = None
                 return
 
-        debug("LSP stdout process ended.")
+        util.debug("LSP stdout process ended.")
 
     def read_stderr(self):
         """
@@ -132,13 +134,13 @@ class Client(object):
         while self.process.poll() is None:
             try:
                 content = self.process.stderr.readline()
-                debug("(stderr): ", content.strip())
+                util.debug("(stderr): ", content.strip())
             except IOError:
-                utl.debug("LSP stderr process ending due to exception: ",
+                utl.util.debug("LSP stderr process ending due to exception: ",
                           sys.exc_info())
                 return
 
-        debug("LSP stderr process ended.")
+        util.debug("LSP stderr process ended.")
 
     def response_handler(self, response):
         try:
@@ -147,9 +149,9 @@ class Client(object):
             if (self.handlers[handler_id]):
                 self.handlers[handler_id](result)
             else:
-                debug("No handler found for id" + response.get("id"))
+                util.debug("No handler found for id" + response.get("id"))
         except Exception as e:
-            debug("error handling response", handler_id)
+            util.debug("error handling response", handler_id)
             raise
 
     def request_handler(self, request):
@@ -158,7 +160,7 @@ class Client(object):
             apply_workspace_edit(sublime.active_window(),
                                  request.get("params"))
         else:
-            debug("Unhandled request", method)
+            util.debug("Unhandled request", method)
 
     def notification_handler(self, response):
         method = response.get("method")
@@ -171,7 +173,7 @@ class Client(object):
             server_log(self.process.args[0],
                        response.get("params").get("message"))
         else:
-            debug("Unhandled notification:", method)
+            util.debug("Unhandled notification:", method)
 
 def initialize_on_open(view: sublime.View):
     global didopen_after_initialize
