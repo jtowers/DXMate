@@ -22,7 +22,7 @@ class Util(object):
         return ''
 
     def plugin_name(self):
-        return 'dxmate'
+        return 'DXMate'
 
 
     def dxProjectFolder(self):
