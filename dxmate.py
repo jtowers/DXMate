@@ -792,3 +792,57 @@ class DxmateCreateProjectCommand(sublime_plugin.TextCommand):
             printer.write('\n' + t)
 
 
+class DxmateExecuteAnonymousApexCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        self.selection = ''
+        for region in self.view.sel():
+            if not region.empty():
+                self.selection += self.view.substr(region)
+        if self.selection == '':
+            self.selection = self.view.substr(sublime.Region(0, self.view.size()))
+        self.file_path = os.path.join(util.dxProjectFolder(), '.sfdx', 'tmpFile.cls')
+        with open(self.file_path, 'w+') as file_obj:
+            file_obj.write(self.selection)
+        printer.show()
+        self.namespace = input
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Running anonymous apex', 'Anonymous apex run')
+        printer.write('\nRunning anonymous apex')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Anonymous apex run')
+
+    def is_enabled(self):
+        self.dx_folder = util.dxProjectFolder()
+        if(self.dx_folder == ''):
+            return False
+        #for region in self.view.sel():
+        #    if not region.empty():
+        #        return True
+        return True
+
+    def run_command(self):
+        args = ['sfdx', 'force:apex:execute', '-f', self.file_path]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             startupinfo=startupinfo, cwd=self.dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nFinished running apex')
+            printer.write('\n' + str(out, 'utf-8'))
+        else:
+            printErr = err
+            if err is None or err == '':
+                printErr = out
+            printer.write('\nError running apex')
+            printer.write('\n' + str(printErr, 'utf-8'))

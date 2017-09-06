@@ -4,16 +4,7 @@
     "caption" : "DXMate",
     "children":
 	    [
-	    	{
-	    		"caption": "Data",
-	    		"children" :
-	    		[
-	    			{
-			    		"caption": "SOQL Query",
-			    		"command" : "dxmate_run_soql"
-	    			}
-	    		]
-	    	},
+	    	
 	    	{
 	    		"caption": "Project",
 	    		"children" :
@@ -39,6 +30,10 @@
 	    			{
 					"caption" : "Run Tests for This Class",
 					"command": "dxmate_run_file_tests"
+				},
+				{
+					"caption" : "Execute as Anonymous Apex",
+					"command": "dxmate_execute_anonymous_apex"
 				}
 	    		]
 	    	},
@@ -49,6 +44,16 @@
 	    			{
 	    				"caption": "Authorize Dev Hub",
 	    				"command": "dxmate_auth_dev_hub"
+	    			}
+	    		]
+	    	},
+	    	{
+	    		"caption": "Data",
+	    		"children" :
+	    		[
+	    			{
+			    		"caption": "SOQL Query",
+			    		"command" : "dxmate_run_soql"
 	    			}
 	    		]
 	    	},

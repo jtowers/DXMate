@@ -32,7 +32,6 @@ UNDERLINE_FLAGS = (sublime.DRAW_NO_FILL
                    | sublime.DRAW_EMPTY_AS_OVERWRITE)
 window_file_diagnostics = dict(
 )
-auto_show_diagnostics_panel = False
 class Point(object):
     def __init__(self, row: int, col: int) -> None:
         self.row = int(row)
@@ -217,48 +216,9 @@ def handle_diagnostics(update: 'Any'):
     origin = 'dxmate'  # TODO: use actual client name to be able to update diagnostics per client
 
     update_file_diagnostics(window, file_path, origin, diagnostics)
-    update_diagnostics_panel(window)
 
 phantom_sets_by_buffer = {}  # type: Dict[int, sublime.PhantomSet]
 
-def create_diagnostics_panel(window):
-    panel = create_output_panel(window, "diagnostics")
-    panel.settings().set("result_file_regex", r"^\s*\S\s+(\S.*):$")
-    panel.settings().set("result_line_regex", r"^\s+([0-9]+):?([0-9]+).*$")
-    #panel.assign_syntax("Packages/" + util.plugin_name() +
-    #                    "/sublime/lang/Diagnostics.sublime-syntax")
-    return panel
-
-def ensure_diagnostics_panel(window):
-    return window.find_output_panel("diagnostics") or create_diagnostics_panel(window)
-
-def update_diagnostics_panel(window):
-    assert window, "missing window!"
-    base_dir = util.dxProjectFolder()
-
-    panel = ensure_diagnostics_panel(window)
-    assert panel, "must have a panel now!"
-
-    if window.id() in window_file_diagnostics:
-        active_panel = window.active_panel()
-        is_active_panel = (active_panel == "output.diagnostics")
-        panel.settings().set("result_base_dir", base_dir)
-        panel.set_read_only(False)
-        panel.run_command("lsp_clear_panel")
-        file_diagnostics = window_file_diagnostics[window.id()]
-        if file_diagnostics:
-            for file_path, source_diagnostics in file_diagnostics.items():
-                relative_file_path = os.path.relpath(file_path, base_dir) if base_dir else file_path
-                if source_diagnostics:
-                    append_diagnostics(panel, relative_file_path, source_diagnostics)
-            if auto_show_diagnostics_panel and not active_panel:
-                window.run_command("show_panel",
-                                   {"panel": "output.diagnostics"})
-        else:
-            if auto_show_diagnostics_panel and is_active_panel:
-                window.run_command("hide_panel",
-                                   {"panel": "output.diagnostics"})
-        panel.set_read_only(True)
 
 
 def append_diagnostics(panel, file_path, origin_diagnostics):
@@ -325,7 +285,6 @@ def remove_diagnostics(view: sublime.View):
         file_path = view.file_name()
         if not window.find_open_file(view.file_name()):
             update_file_diagnostics(window, file_path, 'dxmate', [])
-            update_diagnostics_panel(window)
         else:
             util.debug('file still open?')
 
