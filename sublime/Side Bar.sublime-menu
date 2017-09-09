@@ -10,6 +10,13 @@
 					"args" : {
 						"paths":[]
 					}
+				},
+				{
+					"caption" : "Create Visualforce Page",
+					"command": "dxmate_create_visualforce_page",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}
