@@ -17,6 +17,12 @@
 					"args" : {
 						"paths":[]
 					}
+				},{
+					"caption" : "Create Visualforce Component",
+					"command": "dxmate_create_visualforce_component",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}

@@ -633,6 +633,68 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
             printer.write('\nError running query:')
             printer.write('\n' + str(err, 'utf-8'))
 
+class DxmateCreateVisualforceComponentCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[]):
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            printer.show()
+            printer.write('\nPlease select a single folder to save the component')
+            return
+
+        self.page_name = 'ComponentName'
+        self.page_label = 'Component Label'
+        self.class_dir = paths[0]
+        sublime.active_window().show_input_panel(
+            'Component API Name', self.page_name, self.get_label, None, None)
+
+
+    def get_label(self, input):
+        self.page_name = input
+        sublime.active_window().show_input_panel(
+            'Component Label', self.page_label, self.create_page, None, None)
+
+    def is_enabled(self, paths=[]):
+        dx_folder = util.dxProjectFolder()
+        if(dx_folder == ''):
+            return False
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            return False
+        return True
+
+    def create_page(self, input):
+        self.page_label = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Creating Visualforce Component', 'Visualforce Component Created')
+        printer.write('\nCreating Visualforce Component')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Visualforce Component Created')
+
+    def run_command(self):
+        dx_folder = util.dxProjectFolder()
+        args = ['sfdx', 'force:visualforce:component:create',
+                '-n', self.page_name,'-l', self.page_label, '-d', self.class_dir]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nVisaulforce Component created')
+            file = os.path.join(self.class_dir, self.page_name + '.component')
+            sublime.active_window().open_file(file)
+        else:
+            printer.write('\nError creating Visualforce Component:')
+            printer.write('\n' + str(err, 'utf-8'))
+
 class DxmateCreateVisualforcePageCommand(sublime_plugin.WindowCommand):
     def run(self, paths=[]):
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
