@@ -45,6 +45,13 @@
 					"args" : {
 						"paths":[]
 					}
+				},
+				{
+					"caption" : "Create Lightning Interface",
+					"command": "dxmate_create_lightning_interface",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}
