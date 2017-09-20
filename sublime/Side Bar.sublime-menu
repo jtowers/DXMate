@@ -17,9 +17,24 @@
 					"args" : {
 						"paths":[]
 					}
-				},{
+				},
+				{
 					"caption" : "Create Visualforce Component",
 					"command": "dxmate_create_visualforce_component",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning App",
+					"command": "dxmate_create_lightning_app",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning Component",
+					"command": "dxmate_create_lightning_component",
 					"args" : {
 						"paths":[]
 					}

@@ -633,6 +633,8 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
             printer.write('\nError running query:')
             printer.write('\n' + str(err, 'utf-8'))
 
+
+
 class DxmateCreateVisualforceComponentCommand(sublime_plugin.WindowCommand):
     def run(self, paths=[]):
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
@@ -755,6 +757,118 @@ class DxmateCreateVisualforcePageCommand(sublime_plugin.WindowCommand):
             sublime.active_window().open_file(file)
         else:
             printer.write('\nError creating Visualforce page:')
+            printer.write('\n' + str(err, 'utf-8'))
+
+
+class DxmateCreateLightningComponentCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[]):
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            printer.show()
+            printer.write('\nPlease select a single folder save the component')
+            return
+
+        self.cmp_name = 'ComponentName'
+        self.class_dir = paths[0]
+        sublime.active_window().show_input_panel(
+            'App Name', self.cmp_name, self.create_cmp, None, None)
+
+    def is_enabled(self, paths=[]):
+        dx_folder = util.dxProjectFolder()
+        if(dx_folder == ''):
+            return False
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            return False
+        return True
+
+    def create_cmp(self, input):
+        self.cmp_name = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Creating Lightning Component', 'Lightning Component Created')
+        printer.write('\nCreating Lightning Component')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Lightning Component Created')
+
+    def run_command(self):
+        dx_folder = util.dxProjectFolder()
+        args = ['sfdx', 'force:lightning:component:create',
+                '-n', self.cmp_name, '-d', self.class_dir]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nLightning Component created')
+            file = os.path.join(self.class_dir, self.cmp_name, self.cmp_name + '.cmp')
+            sublime.active_window().open_file(file)
+        else:
+            printer.write('\nError creating Lightning Component:')
+            printer.write('\n' + str(err, 'utf-8'))
+
+
+class DxmateCreateLightningAppCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[]):
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            printer.show()
+            printer.write('\nPlease select a single folder save the class')
+            return
+
+        self.app_name = 'AppName'
+        self.class_dir = paths[0]
+        sublime.active_window().show_input_panel(
+            'App Name', self.app_name, self.create_app, None, None)
+
+    def is_enabled(self, paths=[]):
+        dx_folder = util.dxProjectFolder()
+        if(dx_folder == ''):
+            return False
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            return False
+        return True
+
+    def create_app(self, input):
+        self.app_name = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Creating Lightning App', 'Lightning App Created')
+        printer.write('\nCreating Lightning App')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Lightning App Created')
+
+    def run_command(self):
+        dx_folder = util.dxProjectFolder()
+        args = ['sfdx', 'force:lightning:app:create',
+                '-n', self.app_name, '-d', self.class_dir]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nLightning App created')
+            file = os.path.join(self.class_dir, self.app_name, self.app_name + '.app')
+            sublime.active_window().open_file(file)
+        else:
+            printer.write('\nError creating Lightning App:')
             printer.write('\n' + str(err, 'utf-8'))
 
 
