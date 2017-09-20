@@ -13,6 +13,7 @@ Supports most useful CLI commands including:
 * Create\open scratch orgs
 * Push\Pull source
 * Create Apex classes
+* Create Lightning Apps, Components, Events, Interfaces and Tests
 * Run tests for an org or specific class
 * Code completion
 * Diagnostics
