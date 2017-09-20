@@ -52,6 +52,13 @@
 					"args" : {
 						"paths":[]
 					}
+				},
+				{
+					"caption" : "Create Lightning Test",
+					"command": "dxmate_create_lightning_test",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}

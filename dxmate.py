@@ -872,6 +872,61 @@ class DxmateCreateLightningComponentCommand(sublime_plugin.WindowCommand):
             printer.write('\n' + str(err, 'utf-8'))
 
 
+class DxmateCreateLightningTestCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[]):
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            printer.show()
+            printer.write('\nPlease select a single folder save the test')
+            return
+
+        self.event_name = 'TestName'
+        self.class_dir = paths[0]
+        sublime.active_window().show_input_panel(
+            'Test Name', self.event_name, self.create_event, None, None)
+
+    def is_enabled(self, paths=[]):
+        if util.isDXProject() == False:
+            return False
+        util.debug(paths)
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            return False
+        return True
+
+    def create_event(self, input):
+        self.event_name = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Creating Lightning Test', 'Lightning Interface Test')
+        printer.write('\nCreating Lightning Test')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Lightning Test Created')
+
+    def run_command(self):
+        dx_folder = util.dxProjectFolder()
+        args = ['sfdx', 'force:lightning:test:create',
+                '-n', self.event_name, '-d', self.class_dir]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nLightning Test created')
+            file = os.path.join(self.class_dir, self.event_name + '.resource')
+            sublime.active_window().open_file(file)
+        else:
+            printer.write('\nError creating Lightning Test:')
+            printer.write('\n' + str(err, 'utf-8'))
+
 class DxmateCreateLightningInterfaceCommand(sublime_plugin.WindowCommand):
     def run(self, paths=[]):
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
