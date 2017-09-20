@@ -38,6 +38,13 @@
 					"args" : {
 						"paths":[]
 					}
+				},
+				{
+					"caption" : "Create Lightning Event",
+					"command": "dxmate_create_lightning_event",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}
