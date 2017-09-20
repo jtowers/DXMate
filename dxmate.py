@@ -324,11 +324,12 @@ class DxmateRunOrgTestsCommand(sublime_plugin.TextCommand):
         ThreadProgress(t, 'Running Org Tests', 'Org tests run')
         PanelThreadProgress(t, 'Running Org Tests')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if self.dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
+        
 
     def run_command(self):
         args = ['sfdx', 'force:apex:test:run', '-r', 'human']
@@ -369,9 +370,9 @@ class DxmatePushSourceCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Source Pushed')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if self.dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -413,9 +414,9 @@ class DxmatePullSourceCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Source Pulled')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if self.dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -457,9 +458,9 @@ class DxmateOpenScratchOrgCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Org Opened')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if self.dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -504,9 +505,9 @@ class DxmateCreateScratchOrgCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Scratch Org Created')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if self.dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -544,9 +545,9 @@ class DxmateAuthDevHubCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Auth Page Opened')
 
-    def is_enabled(self):
-        dx_folder = util.dxProjectFolder()
-        if dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -578,8 +579,8 @@ class DxmateRunSoqlCommand(sublime_plugin.WindowCommand):
             'Query', '', self.run_query, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -655,8 +656,8 @@ class DxmateCreateVisualforceComponentCommand(sublime_plugin.WindowCommand):
             'Component Label', self.page_label, self.create_page, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             return False
@@ -717,8 +718,8 @@ class DxmateCreateVisualforcePageCommand(sublime_plugin.WindowCommand):
             'Page Label', self.page_label, self.create_page, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             return False
@@ -773,8 +774,63 @@ class DxmateCreateLightningComponentCommand(sublime_plugin.WindowCommand):
             'App Name', self.cmp_name, self.create_cmp, None, None)
 
     def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
+            return False
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            return False
+        return True
+
+    def create_cmp(self, input):
+        self.cmp_name = input
+        printer.show()
+        t = threading.Thread(target=self.run_command)
+        t.start()
+        t.printer = printer
+        t.process_id = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        ThreadProgress(t, 'Creating Lightning Component', 'Lightning Component Created')
+        printer.write('\nCreating Lightning Component')
+        printer.write('\nResult: ')
+        PanelThreadProgress(t, 'Lightning Component Created')
+
+    def run_command(self):
         dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        args = ['sfdx', 'force:lightning:component:create',
+                '-n', self.cmp_name, '-d', self.class_dir]
+        startupinfo = None
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, startupinfo=startupinfo, cwd=dx_folder)
+
+        p.wait()
+
+        out, err = p.communicate()
+        r = p.returncode
+        if p.returncode == 0:
+            printer.write('\nLightning Component created')
+            file = os.path.join(self.class_dir, self.cmp_name, self.cmp_name + '.cmp')
+            sublime.active_window().open_file(file)
+        else:
+            printer.write('\nError creating Lightning Component:')
+            printer.write('\n' + str(err, 'utf-8'))
+
+class DxmateCreateLightningComponentCommand(sublime_plugin.WindowCommand):
+    def run(self, paths=[]):
+        if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
+            printer.show()
+            printer.write('\nPlease select a single folder save the component')
+            return
+
+        self.cmp_name = 'ComponentName'
+        self.class_dir = paths[0]
+        sublime.active_window().show_input_panel(
+            'App Name', self.cmp_name, self.create_cmp, None, None)
+
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             return False
@@ -829,8 +885,8 @@ class DxmateCreateLightningAppCommand(sublime_plugin.WindowCommand):
             'App Name', self.app_name, self.create_app, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        
+        if util.isDXProject() == False:
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             return False
@@ -885,8 +941,8 @@ class DxmateCreateApexClassCommand(sublime_plugin.WindowCommand):
             'Class Name', self.class_name, self.create_class, None, None)
 
     def is_enabled(self, paths=[]):
-        dx_folder = util.dxProjectFolder()
-        if(dx_folder == ''):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         if len(paths) != 1 or (len(paths) > 0 and os.path.isfile(paths[0])):
             return False
@@ -941,9 +997,9 @@ class DxmateUpgradeProjectCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Project Upgraded')
 
-    def is_enabled(self):
-        dx_folder = util.dxProjectFolder()
-        if dx_folder == '':
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
         return True
 
@@ -1053,13 +1109,10 @@ class DxmateExecuteAnonymousApexCommand(sublime_plugin.TextCommand):
         printer.write('\nResult: ')
         PanelThreadProgress(t, 'Anonymous apex run')
 
-    def is_enabled(self):
-        self.dx_folder = util.dxProjectFolder()
-        if(self.dx_folder == ''):
+    def is_enabled(self, paths=[]):
+        #dx_folder = util.dxProjectFolder()
+        if util.isDXProject() == False:
             return False
-        #for region in self.view.sel():
-        #    if not region.empty():
-        #        return True
         return True
 
     def run_command(self):
