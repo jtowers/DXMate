@@ -7,6 +7,10 @@
 				{
 					"caption" : "Run Tests for This Class",
 					"command": "dxmate_run_file_tests"
+				},
+				{
+					"caption" : "Execute as Anonymous Apex",
+					"command": "dxmate_execute_anonymous_apex"
 				}
 	    	]
 	}

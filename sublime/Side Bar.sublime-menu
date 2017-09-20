@@ -10,6 +10,55 @@
 					"args" : {
 						"paths":[]
 					}
+				},
+				{
+					"caption" : "Create Visualforce Page",
+					"command": "dxmate_create_visualforce_page",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Visualforce Component",
+					"command": "dxmate_create_visualforce_component",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning App",
+					"command": "dxmate_create_lightning_app",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning Component",
+					"command": "dxmate_create_lightning_component",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning Event",
+					"command": "dxmate_create_lightning_event",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning Interface",
+					"command": "dxmate_create_lightning_interface",
+					"args" : {
+						"paths":[]
+					}
+				},
+				{
+					"caption" : "Create Lightning Test",
+					"command": "dxmate_create_lightning_test",
+					"args" : {
+						"paths":[]
+					}
 				}
 	    	]
 	}

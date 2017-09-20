@@ -9,8 +9,11 @@ from collections import OrderedDict
 import json
 
 class Util(object):
-    sublime_version = int(float(sublime.version()))
-    settings = None
+    def __init__(self):
+        self.settings = None
+        self.sublime_version = int(float(sublime.version()))
+        self.DXWindows = {}
+
     def load_settings(self):
         return sublime.load_settings('dxmate.sublime-settings')
 
@@ -27,14 +30,30 @@ class Util(object):
 
     def dxProjectFolder(self):
         for window in sublime.windows():
-            open_folders = window.folders()
-            for folder in open_folders:
-                for root, dirs, files in os.walk(folder, topdown=False):
-                    for name in files:
-                        if name == 'sfdx-project.json':
-                            return folder
+            folder = self.get_dx_folder_for_window(window) 
+            if folder != '':
+                return folder
         return ''
 
+
+    def get_dx_folder_for_window(self, window):
+        open_folders = window.folders()
+        for folder in open_folders:
+            for root, dirs, files in os.walk(folder, topdown=False):
+                for name in files:
+                    if name == 'sfdx-project.json':
+                        return folder
+        return ''
+    def isDXProject(self):
+        windowId = sublime.active_window().id()
+        if windowId not in self.DXWindows:
+            projectFolder = self.get_dx_folder_for_window(sublime.active_window())
+            if projectFolder == '':
+                self.DXWindows[windowId] = False
+            else:
+                self.DXWindows[windowId] = True
+        return self.DXWindows[windowId]
+        
     def file_is_test(self,view):
         contents = view.substr(sublime.Region(0, view.size()))
         return '@istest' in contents.lower() or 'testmethod' in contents.lower()
